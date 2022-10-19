@@ -1,0 +1,20 @@
+.split-pane:horizontal > .split-pane-divider {
+   -fx-padding: 1 ;
+}
+.split-pane:vertical > .split-pane-divider {
+   -fx-padding: 1 ;
+}
+.split-pane {
+    -fx-background-color: #333333;
+    -fx-border-color: #333333;
+}
+.code-area {
+    -fx-background-color: #333333;
+}
+.code-area .content {
+    -fx-background-color: #333333;
+    -fx-cursor: DEFAULT
+}
+.text-input {
+    -fx-text-fill: #cccccc;
+}
