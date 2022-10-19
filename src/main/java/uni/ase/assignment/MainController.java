@@ -9,18 +9,42 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.LineNumberFactory;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 public class MainController {
     double x,y;
     boolean isMaximized = false;
     Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
-    @FXML private AnchorPane window;
-//    private Stage stage = (Stage) window.getScene().getWindow();
     private Stage stage;
+    private FontIcon fullscreenico;
+    private EventHandler<MouseEvent> unMaximize = new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent e) {
+            if (fullscreenico == null) {
+                HBox window = (HBox) stage.getScene().getRoot().getChildrenUnmodifiable().get(0);
+                AnchorPane pane = (AnchorPane) window.getChildren().get(1);
+                fullscreenico = (FontIcon) pane.getChildren().get(0);
+            }
+            fullscreenico.setIconLiteral("bi-fullscreen");
+            System.out.println("x: " + e.getScreenX() + " y: " + e.getScreenY());
+            double winheight = (bounds.getHeight() / 3) * 2;
+            double winwidth  = (winheight / 9) * 16;
+            stage.setX(e.getScreenX() - (winwidth/2));
+            stage.setY(e.getScreenY());
+            stage.setWidth(winwidth);
+            stage.setHeight(winheight);
+            isMaximized = false;
+            stage.removeEventHandler(MouseEvent.MOUSE_DRAGGED, this);
+        }
+    };
+    @FXML CodeArea MainCodeArea;
+    @FXML CodeArea OutputCodeArea;
 
     public void setStage(Stage stage) {
         this.stage = stage;
+        MainCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(MainCodeArea));
     }
 
     @FXML
@@ -30,54 +54,84 @@ public class MainController {
     }
     @FXML
     protected void mouseReleased(MouseEvent e) {
-        if (stage.getX() < 5){
+        if (e.getScreenX() < 5 && e.getScreenY() > 5){
             stage.setX(bounds.getMinX());
             stage.setY(bounds.getMinY());
             stage.setWidth(bounds.getWidth() / 2);
             stage.setHeight(bounds.getHeight());
-            isMaximized = !isMaximized;
-        } else if (stage.getX() > bounds.getWidth() - 5) {
+            isMaximized = true;
+            fullscreenico.setIconLiteral("bi-fullscreen-exit");
+            stage.addEventHandler(MouseEvent.MOUSE_DRAGGED, unMaximize);
+        }
+        if (e.getScreenX() > bounds.getWidth() - 5 && e.getScreenY() > 5) {
             stage.setX(bounds.getWidth() / 2);
             stage.setY(bounds.getMinY());
             stage.setWidth(bounds.getWidth() / 2);
             stage.setHeight(bounds.getHeight());
-            isMaximized = !isMaximized;
+            isMaximized = true;
+            fullscreenico.setIconLiteral("bi-fullscreen-exit");
+            stage.addEventHandler(MouseEvent.MOUSE_DRAGGED, unMaximize);
+        }
+        if (e.getScreenY() < 5) {
+            if (e.getScreenX() > 5 && e.getScreenX() < bounds.getWidth() - 5 ) {
+                HBox box = (HBox) e.getSource();
+                AnchorPane pane = (AnchorPane) box.getChildren().get(1);
+                FontIcon ico = (FontIcon) pane.getChildren().get(0);
+                ico.setIconLiteral("bi-fullscreen-exit");
+                stage.setX(bounds.getMinX());
+                stage.setY(bounds.getMinY());
+                stage.setWidth(bounds.getWidth());
+                stage.setHeight(bounds.getHeight());
+                isMaximized = true;
+                fullscreenico.setIconLiteral("bi-fullscreen-exit");
+                stage.addEventHandler(MouseEvent.MOUSE_DRAGGED, unMaximize);
+            } else if (e.getScreenX() < 5) {
+                stage.setX(bounds.getMinX());
+                stage.setY(bounds.getMinY());
+                stage.setWidth(bounds.getWidth() / 2);
+                stage.setHeight(bounds.getHeight() / 2);
+                isMaximized = true;
+                fullscreenico.setIconLiteral("bi-fullscreen-exit");
+                stage.addEventHandler(MouseEvent.MOUSE_DRAGGED, unMaximize);
+            } else if (e.getScreenX() > bounds.getWidth() - 5) {
+                stage.setX(bounds.getWidth() / 2);
+                stage.setY(bounds.getMinY());
+                stage.setWidth(bounds.getWidth() / 2);
+                stage.setHeight(bounds.getHeight() / 2);
+                isMaximized = true;
+                fullscreenico.setIconLiteral("bi-fullscreen-exit");
+                stage.addEventHandler(MouseEvent.MOUSE_DRAGGED, unMaximize);
+            }
+        }
+        if (e.getScreenY() > bounds.getHeight() - 5) {
+            if (e.getScreenX() < 5) {
+                stage.setX(bounds.getMinX());
+                stage.setY(bounds.getHeight() / 2);
+                stage.setWidth(bounds.getWidth() / 2);
+                stage.setHeight(bounds.getHeight() / 2);
+                isMaximized = true;
+                fullscreenico.setIconLiteral("bi-fullscreen-exit");
+                stage.addEventHandler(MouseEvent.MOUSE_DRAGGED, unMaximize);
+            } else if (e.getScreenX() > bounds.getWidth() - 5) {
+                stage.setX(bounds.getWidth() / 2);
+                stage.setY(bounds.getHeight() / 2);
+                stage.setWidth(bounds.getWidth() / 2);
+                stage.setHeight(bounds.getHeight() / 2);
+                isMaximized = true;
+                fullscreenico.setIconLiteral("bi-fullscreen-exit");
+                stage.addEventHandler(MouseEvent.MOUSE_DRAGGED, unMaximize);
+            }
         }
     }
     @FXML
     protected void mouseDragged(MouseEvent e) {
+        if (fullscreenico == null) {
+            HBox window = (HBox) stage.getScene().getRoot().getChildrenUnmodifiable().get(0);
+            AnchorPane pane = (AnchorPane) window.getChildren().get(1);
+            fullscreenico = (FontIcon) pane.getChildren().get(0);
+        }
         stage.setX(e.getScreenX() - x);
         stage.setY(e.getScreenY() - y);
-        if (isMaximized && stage.getY() > 0) {
-            HBox box = (HBox) e.getSource();
-            AnchorPane pane = (AnchorPane) box.getChildren().get(1);
-            FontIcon ico = (FontIcon) pane.getChildren().get(0);
-            ico.setIconLiteral("bi-fullscreen");
-            double winheight = (bounds.getHeight() / 3) * 2;
-            double winwidth  = (winheight / 9) * 16;
-            stage.setX(e.getScreenX() - (winwidth/2));
-            stage.setY(e.getScreenY() - (winheight/2));
-            stage.setWidth(winwidth);
-            stage.setHeight(winheight);
-            isMaximized = !isMaximized;
-        }
-        if (e.getScreenY() == 0) {
-            stage.addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    HBox box = (HBox) e.getSource();
-                    AnchorPane pane = (AnchorPane) box.getChildren().get(1);
-                    FontIcon ico = (FontIcon) pane.getChildren().get(0);
-                    ico.setIconLiteral("bi-fullscreen-exit");
-                    stage.setX(bounds.getMinX());
-                    stage.setY(bounds.getMinY());
-                    stage.setWidth(bounds.getWidth());
-                    stage.setHeight(bounds.getHeight());
-                    isMaximized = !isMaximized;
-                    stage.removeEventHandler(MouseEvent.MOUSE_RELEASED, this);
-                }
-            });
-        }
     }
 
     @FXML
@@ -108,7 +162,7 @@ public class MainController {
             stage.setY((bounds.getHeight()/2) - (winheight/2));
             stage.setWidth(winwidth);
             stage.setHeight(winheight);
-            isMaximized = !isMaximized;
+            isMaximized = false;
         } else {
             AnchorPane but = (AnchorPane) e.getSource();
             FontIcon ico = (FontIcon) but.getChildren().get(0);
@@ -117,7 +171,7 @@ public class MainController {
             stage.setY(bounds.getMinY());
             stage.setWidth(bounds.getWidth());
             stage.setHeight(bounds.getHeight());
-            isMaximized = !isMaximized;
+            isMaximized = true;
         }
     }
     @FXML
