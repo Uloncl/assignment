@@ -7,8 +7,6 @@ import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.LineNumberFactory;
 
 import java.io.IOException;
 
@@ -30,8 +28,8 @@ public class MainApplication extends Application {
         stage.setScene(scene);
         stage.setResizable(true);
         ResizeHelper.addResizeListener(stage);
-        CodeArea codearea = new CodeArea();
-        codearea.setParagraphGraphicFactory(LineNumberFactory.get(codearea));
+//        CodeArea codearea = new CodeArea();
+//        codearea.setParagraphGraphicFactory(LineNumberFactory.get(codearea));
         stage.show();
     }
 

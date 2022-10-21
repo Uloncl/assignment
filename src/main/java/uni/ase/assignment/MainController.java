@@ -9,8 +9,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.LineNumberFactory;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 public class MainController {
@@ -39,12 +37,13 @@ public class MainController {
             stage.removeEventHandler(MouseEvent.MOUSE_DRAGGED, this);
         }
     };
-    @FXML CodeArea MainCodeArea;
-    @FXML CodeArea OutputCodeArea;
+//    @FXML CodeArea MainCodeArea;
+//    @FXML
+//    ScrollPane MainCodeAreaScrollPane;
+//    @FXML CodeArea OutputCodeArea;
 
     public void setStage(Stage stage) {
         this.stage = stage;
-        MainCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(MainCodeArea));
     }
 
     @FXML
