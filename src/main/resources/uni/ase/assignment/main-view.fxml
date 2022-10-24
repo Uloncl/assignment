@@ -11,46 +11,32 @@
 
 <AnchorPane id="window" fx:id="window" prefHeight="385.0" prefWidth="769.0" style="-fx-border-radius: 10px;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uni.ase.assignment.MainController">
     <children>
-        <HBox alignment="CENTER_RIGHT" layoutX="-6.0" layoutY="-10.0" onMouseDragged="#mouseDragged" onMousePressed="#mousePressed" onMouseReleased="#mouseReleased" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: #333333; -fx-border-radius: 10px;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <children>
-                <FontIcon iconColor="WHITE" iconLiteral="bi-dash" iconSize="40" onMouseClicked="#minusMouseClicked" onMouseEntered="#minusMouseEntered" onMouseExited="#minusMouseExited" />
-                <AnchorPane onMouseClicked="#fullscreenMouseClicked" onMouseEntered="#fullscreenMouseEntered" onMouseExited="#fullscreenMouseExited" prefHeight="40.0" prefWidth="40.0">
-                    <HBox.margin>
-                        <Insets />
-                    </HBox.margin>
-                    <children>
-                        <FontIcon iconColor="WHITE" iconLiteral="bi-fullscreen" iconSize="25" AnchorPane.bottomAnchor="7.5" AnchorPane.leftAnchor="7.5" AnchorPane.rightAnchor="7.5" AnchorPane.topAnchor="7.5" />
-                    </children>
-                </AnchorPane>
-                <FontIcon iconColor="WHITE" iconLiteral="bi-x" iconSize="40" layoutX="10.0" layoutY="50.0" onMouseClicked="#exitMouseClicked" onMouseEntered="#exitMouseEntered" onMouseExited="#exitMouseExited" />
-            </children>
-        </HBox>
-        <SplitPane dividerPositions="0.6130434782608696" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="381.0" prefWidth="769.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
+        <SplitPane dividerPositions="0.6130434782608696" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="381.0" prefWidth="769.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
             <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                     <children>
-                        <SplitPane id="splitPane2" dividerPositions="0.4139240506329114" prefHeight="352.0" prefWidth="792.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <SplitPane id="splitPane2" dividerPositions="0.4139240506329114" prefHeight="352.0" prefWidth="792.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <items>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" style="-fx-background-color: #333333;">
+                                <AnchorPane minHeight="0.0" minWidth="0.0">
                                     <children>
-                              <AnchorPane minHeight="0.0" minWidth="0.0" style="-fx-background-color: #333333; -fx-border-color: #cccccc; -fx-border-radius: 10px;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                              <AnchorPane layoutX="1.0" layoutY="1.0" style="-fx-border-color: #cccccc; -fx-background-color: #333333;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <CodeArea lineHighlighterOn="true" prefHeight="185.0" prefWidth="248.0" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
-                                       <cursor>
-                                          <Cursor fx:constant="TEXT" />
-                                       </cursor>
-                                    </CodeArea>
+                                                <CodeArea id="MainCodeArea" fx:id="MainCodeArea" lineHighlighterOn="true" prefHeight="185.0" prefWidth="248.0" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                    <cursor>
+                                                        <Cursor fx:constant="TEXT" />
+                                                    </cursor>
+                                                </CodeArea>
                                  </children>
                               </AnchorPane>
                                     </children>
                                 </AnchorPane>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" style="-fx-background-color: #333333;">
                                     <children>
-                                        <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: #cccccc; -fx-border-radius: 10px;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
-                                            <children>
-                                                <Canvas height="350.0" width="460.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                            </children>
-                                        </AnchorPane>
+                                          <ScrollPane pannable="true" prefHeight="217.0" prefWidth="435.0" style="-fx-background-color: #333333; -fx-border-color: #cccccc;" styleClass="edge-to-edge" stylesheets="@main.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                              <content>
+                                                  <Canvas id="canvas" fx:id="canvas" height="10000.0" style="-fx-background-color: #333333;" width="10000.0" />
+                                              </content>
+                                          </ScrollPane>
                                     </children>
                                 </AnchorPane>
                             </items>
@@ -59,7 +45,7 @@
                 </AnchorPane>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" style="-fx-background-color: #333333;">
                     <children>
-                        <AnchorPane prefHeight="110.0" prefWidth="782.0" style="-fx-border-radius: 10px; -fx-border-color: #cccccc;" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                        <AnchorPane prefHeight="110.0" prefWidth="782.0" style="-fx-border-color: #cccccc;" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="3.0">
                             <children>
                                 <CodeArea id="code-area" fx:id="OutputCodeArea" lineHighlighterOn="true" prefHeight="352.0" prefWidth="324.0" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                                     <cursor>
@@ -68,9 +54,9 @@
                                 </CodeArea>
                             </children>
                         </AnchorPane>
-                        <AnchorPane layoutX="10.0" layoutY="10.0" maxHeight="35.0" minHeight="35.0" prefHeight="0.0" prefWidth="782.0" style="-fx-border-radius: 10px; -fx-border-color: #cccccc;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0">
+                        <AnchorPane layoutX="10.0" layoutY="10.0" maxHeight="35.0" minHeight="35.0" prefHeight="0.0" prefWidth="782.0" style="-fx-border-color: #cccccc;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                             <children>
-                                <TextField alignment="BOTTOM_LEFT" prefHeight="20.0" prefWidth="792.0" style="-fx-background-color: #333333;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                                <TextField id="commandLine" fx:id="commandLine" alignment="BOTTOM_LEFT" onKeyPressed="#cmdPressed" prefHeight="20.0" prefWidth="792.0" style="-fx-background-color: #333333;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <font>
                                         <Font name="Roboto Light" size="12.0" />
                                     </font>
@@ -78,8 +64,25 @@
                             </children>
                         </AnchorPane>
                     </children>
+               <padding>
+                  <Insets left="1.0" right="1.0" />
+               </padding>
                 </AnchorPane>
             </items>
         </SplitPane>
+        <HBox alignment="CENTER_RIGHT" layoutX="-6.0" layoutY="-10.0" onMouseDragged="#mouseDragged" onMousePressed="#mousePressed" onMouseReleased="#mouseReleased" prefHeight="20.0" prefWidth="200.0" style="-fx-background-color: #333333; -fx-border-width: 0 0 1 0; -fx-border-color: #cccccc;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <FontIcon iconColor="WHITE" iconLiteral="bi-dash" iconSize="20" onMouseClicked="#minusMouseClicked" onMouseEntered="#minusMouseEntered" onMouseExited="#minusMouseExited" />
+                <AnchorPane onMouseClicked="#fullscreenMouseClicked" onMouseEntered="#fullscreenMouseEntered" onMouseExited="#fullscreenMouseExited" prefHeight="20.0" prefWidth="20.0">
+                    <HBox.margin>
+                        <Insets />
+                    </HBox.margin>
+                    <children>
+                        <FontIcon iconColor="WHITE" iconLiteral="bi-fullscreen" iconSize="10" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
+                    </children>
+                </AnchorPane>
+                <FontIcon iconColor="WHITE" iconLiteral="bi-x" iconSize="20" layoutX="10.0" layoutY="50.0" onMouseClicked="#exitMouseClicked" onMouseEntered="#exitMouseEntered" onMouseExited="#exitMouseExited" />
+            </children>
+        </HBox>
     </children>
 </AnchorPane>

@@ -18,3 +18,17 @@
 .text-input {
     -fx-text-fill: #cccccc;
 }
+
+.scroll-pane {
+    -fx-background-color: #333333;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.scroll-pane:focused {
+    -fx-background-insets: 0;
+}
+
+.scroll-pane .corner {
+    -fx-background-insets: 0;
+}

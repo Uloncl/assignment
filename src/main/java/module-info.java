@@ -6,6 +6,7 @@ module uni.ase.assignment {
     requires org.fxmisc.richtext;
     requires org.fxmisc.flowless;
     requires reactfx;
+    requires kotlin.stdlib;
 
     opens uni.ase.assignment to javafx.fxml;
     exports uni.ase.assignment;
