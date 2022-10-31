@@ -16,8 +16,10 @@ import javafx.stage.Stage;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.kordamp.ikonli.javafx.FontIcon;
-
-import static java.lang.Double.parseDouble;
+import uni.ase.assignment.controllers.CanvasController;
+import uni.ase.assignment.controllers.CodeParser;
+import uni.ase.assignment.controllers.ConsoleController;
+import uni.ase.assignment.controllers.LogController;
 
 public class MainController {
     double x,y;
@@ -25,11 +27,15 @@ public class MainController {
     Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
     private Stage stage;
     private FontIcon fullscreenico;
-    private CanvasController cc;
-    @FXML
-    private Canvas canvas;
-    @FXML
-    private TextField commandLine;
+    @FXML private FontIcon run;
+    @FXML CodeArea MainCodeArea;
+    @FXML CodeArea OutputCodeArea;
+    @FXML private Canvas canvas;
+    @FXML private TextField commandLine;
+    private LogController lc;
+    private CanvasController cac;
+    private CodeParser cp;
+    private ConsoleController coc;
     private EventHandler<MouseEvent> unMaximize = new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent e) {
@@ -50,90 +56,30 @@ public class MainController {
             stage.removeEventHandler(MouseEvent.MOUSE_DRAGGED, this);
         }
     };
-    @FXML CodeArea MainCodeArea;
-//    @FXML
-//    ScrollPane MainCodeAreaScrollPane;
-    @FXML CodeArea OutputCodeArea;
 
     public void setStage(Stage stage) {
         this.stage = stage;
         canvas.getGraphicsContext2D().setFill(Color.web("#333333"));
         canvas.getGraphicsContext2D().fillRect(0, 0, 10000, 10000);
-        cc = new CanvasController(canvas.getGraphicsContext2D());
         MainCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(MainCodeArea));
         OutputCodeArea.setEditable(false);
+
+        lc = new LogController(OutputCodeArea);
+        cac = new CanvasController(canvas.getGraphicsContext2D(), lc);
+        coc = new ConsoleController(commandLine, cac, lc);
+        cp = new CodeParser(MainCodeArea, cac, lc);
     }
 
     @FXML
     protected void cmdPressed(KeyEvent k) {
         if(k.getCode() == KeyCode.ENTER) {
-            String commandStr = commandLine.getCharacters().toString();
-            String[] command = commandStr.split(" ");
-            switch (command[0]) {
-                case "drawOval":
-                    if (command.length == 5) {
-                        try {
-                            cc.DrawOval(parseDouble(command[1]), parseDouble(command[2]), parseDouble(command[3]), parseDouble(command[4]));
-                            cc.cmdHistAppend(commandStr);
-                        } catch (Exception e) {
-                            OutputCodeArea.append(e + "\n", "");
-                        }
-                    } else {
-                        OutputCodeArea.append("error: not enough command params\n", "");
-                    }
-                    break;
-                case "drawRect":
-                    if (command.length == 5) {
-                        try {
-                            cc.DrawRect(parseDouble(command[1]), parseDouble(command[2]), parseDouble(command[3]), parseDouble(command[4]));
-                            cc.cmdHistAppend(commandStr);
-                        } catch (Exception e) {
-                            OutputCodeArea.append(e + "\n", "");
-                        }
-                    } else {
-                        OutputCodeArea.append("error: not enough command params\n", "");
-                    }
-                    break;
-                case "drawLine":
-                    if (command.length == 5) {
-                        try {
-                            cc.DrawLine(parseDouble(command[1]), parseDouble(command[2]), parseDouble(command[3]), parseDouble(command[4]));
-                            cc.cmdHistAppend(commandStr);
-                        } catch (Exception e) {
-                            OutputCodeArea.append(e + "\n", "");
-                        }
-                    } else {
-                        OutputCodeArea.append("error: not enough command params\n", "");
-                    }
-                    break;
-                case "drawArc":
-                    if (command.length == 8) {
-                        try {
-                            cc.DrawArc(parseDouble(command[1]), parseDouble(command[2]), parseDouble(command[3]), parseDouble(command[4]), parseDouble(command[5]), parseDouble(command[6]), command[7]);
-                            cc.cmdHistAppend(commandStr);
-                        } catch (Exception e) {
-                            OutputCodeArea.append(e + "\n", "");
-                        }
-                    } else {
-                        OutputCodeArea.append("error: not enough command params\n", "");
-                    }
-                    break;
-                case "drawPoly":
-                    if (command.length == 5) {
-                        try {
-                            cc.DrawPoly(parseDouble(command[1]), parseDouble(command[2]), parseDouble(command[3]), parseDouble(command[4]));
-                            cc.cmdHistAppend(commandStr);
-                        } catch (Exception e) {
-                            OutputCodeArea.append(e + "\n", "");
-                        }
-                    } else {
-                        OutputCodeArea.append("error: not enough command params\n", "");
-                    }
-                    break;
-                default:
-                    OutputCodeArea.append("error: Command Invalid\n", "");
-            }
+            coc.run();
         }
+    }
+
+    @FXML protected void runCode() {
+        System.out.println("running code");
+        cp.run();
     }
 
     @FXML
