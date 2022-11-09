@@ -1,12 +1,16 @@
 package uni.ase.assignment.controllers
 
-import org.fxmisc.richtext.CodeArea
+import javafx.scene.control.TextArea
 
-class LogController (val log: CodeArea) {
+
+class LogController (val log: TextArea) {
     fun error(text: String) {
         log.appendText("ERROR: $text\n")
     }
     fun out(text: String) {
         log.appendText("$text\n")
+    }
+    fun clear() {
+        log.clear()
     }
 }

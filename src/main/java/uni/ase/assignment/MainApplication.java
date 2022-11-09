@@ -10,7 +10,24 @@ import javafx.stage.StageStyle;
 
 import java.io.IOException;
 
+/**
+ * The Main Application
+ *
+ * loads JXML file for window layout and sets up the stage for the window
+ */
 public class MainApplication extends Application {
+
+    /**
+     * loads the Main Window from the JXML file and uses it to setup the stage.
+     *
+     * This window is undecorated and all functionality is custom.
+     *
+     * @param stage the primary stage for this application, onto which
+     * the application scene can be set.
+     * Applications may create other stages, if needed, but they will not be
+     * primary stages.
+     * @throws IOException
+     */
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("main-view.fxml"));
@@ -28,8 +45,6 @@ public class MainApplication extends Application {
         stage.setScene(scene);
         stage.setResizable(true);
         ResizeHelper.addResizeListener(stage);
-//        CodeArea codearea = new CodeArea();
-//        codearea.setParagraphGraphicFactory(LineNumberFactory.get(codearea));
         stage.show();
     }
 

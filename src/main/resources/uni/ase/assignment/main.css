@@ -8,13 +8,6 @@
     -fx-background-color: #333333;
     -fx-border-color: #333333;
 }
-.code-area {
-    -fx-background-color: #333333;
-}
-.code-area .content {
-    -fx-background-color: #333333;
-    -fx-cursor: DEFAULT
-}
 .text-input {
     -fx-text-fill: #cccccc;
 }
@@ -31,4 +24,34 @@
 
 .scroll-pane .corner {
     -fx-background-insets: 0;
+}
+
+.paragraph-text {
+    -fx-tab-size: 4
+}
+.paragraph-text .text {
+    -fx-fill: #cccccc
+}
+
+.text-area {
+    -fx-background-insets: 0;
+    -fx-background-color: transparent, #333333, transparent, #333333;
+}
+
+.text-area .content {
+    -fx-background-color: transparent, #333333, transparent, #333333;
+}
+
+.text-area:focused .content {
+    -fx-background-color: transparent, #333333, transparent, #333333;
+}
+
+.text-area:focused {
+    -fx-highlight-fill: #cccccc;
+}
+
+.text-area .content {
+    -fx-padding: 10px;
+    -fx-text-fill: #cccccc;
+    -fx-highlight-fill: #cccccc;
 }

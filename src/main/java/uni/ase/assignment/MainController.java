@@ -4,7 +4,9 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -13,29 +15,36 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.LineNumberFactory;
 import org.kordamp.ikonli.javafx.FontIcon;
 import uni.ase.assignment.controllers.CanvasController;
 import uni.ase.assignment.controllers.CodeParser;
 import uni.ase.assignment.controllers.ConsoleController;
 import uni.ase.assignment.controllers.LogController;
 
+/**
+ * the Main Controller class which is used to process actions from the main window such as clicks or movements
+ */
 public class MainController {
+
     double x,y;
     boolean isMaximized = false;
     Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
     private Stage stage;
     private FontIcon fullscreenico;
     @FXML private FontIcon run;
-    @FXML CodeArea MainCodeArea;
-    @FXML CodeArea OutputCodeArea;
+    @FXML private ImageView pen;
+    @FXML TextArea code;
+    @FXML TextArea out;
     @FXML private Canvas canvas;
     @FXML private TextField commandLine;
     private LogController lc;
     private CanvasController cac;
     private CodeParser cp;
     private ConsoleController coc;
+
+    /**
+     * an event handler to be used for custom fullscreen functionality
+     */
     private EventHandler<MouseEvent> unMaximize = new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent e) {
@@ -57,36 +66,68 @@ public class MainController {
         }
     };
 
+    /**
+     * sets up and initialises some variables when the window is loaded, this is called from the [MainApplication] class
+     *
+     * @param stage
+     */
     public void setStage(Stage stage) {
         this.stage = stage;
         canvas.getGraphicsContext2D().setFill(Color.web("#333333"));
         canvas.getGraphicsContext2D().fillRect(0, 0, 10000, 10000);
-        MainCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(MainCodeArea));
-        OutputCodeArea.setEditable(false);
+        out.setEditable(false);
 
-        lc = new LogController(OutputCodeArea);
+        lc = new LogController(out);
         cac = new CanvasController(canvas.getGraphicsContext2D(), lc);
         coc = new ConsoleController(commandLine, cac, lc);
-        cp = new CodeParser(MainCodeArea, cac, lc);
+        cp = new CodeParser(code, cac, lc, coc);
+
+        pen.setX(0);
+        pen.setY(0);
+
     }
 
+    /**
+     * when the commandLine is selected and a key is pressed this method is called to process the action taken by the
+     * user. this could be running a command or navigating command history
+     *
+     * @param k the keyevent containing information about which key was pressed
+     */
     @FXML
     protected void cmdPressed(KeyEvent k) {
         if(k.getCode() == KeyCode.ENTER) {
-            coc.run();
+            coc.run("");
+        } else if (k.getCode() == KeyCode.UP) {
+            coc.cmdLast();
+        } else if (k.getCode() == KeyCode.DOWN) {
+            coc.cmdNext();
         }
     }
 
+    /**
+     * runs the code in the code textbox when the green play button above it is pressed
+     */
     @FXML protected void runCode() {
-        System.out.println("running code");
         cp.run();
     }
 
+    /**
+     * used for recognising the position of the window when the user tries to drag the window
+     *
+     * @param e the MouseEvent containing information such as the position of the mouse
+     */
     @FXML
     protected void mousePressed(MouseEvent e) {
         x = e.getSceneX();
         y = e.getSceneY();
     }
+
+    /**
+     * when the mouse is released this method checks the position of the mouse to decide if the window should snap to a
+     * certain position 
+     *
+     * @param e
+     */
     @FXML
     protected void mouseReleased(MouseEvent e) {
         if (e.getScreenX() < 5 && e.getScreenY() > 5){
