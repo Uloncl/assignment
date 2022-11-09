@@ -53,7 +53,6 @@ internal class CanvasControllerTest (val cac: CanvasController) {
     @Test
     fun testSetStrokeColour() : Boolean {
         try {
-            cac.setStroke(Color.RED)
             cac.setStroke("red")
             cac.setStrokeHex("#696969")
             return true
@@ -68,9 +67,8 @@ internal class CanvasControllerTest (val cac: CanvasController) {
     @Test
     fun testSetFillColour() : Boolean {
         try {
-            cac.setFill(Color.RED)
-            cac.setFill("red")
-            cac.setFillHex("#420420")
+            cac.setFillCol("red")
+            cac.setFillColHex("#420420")
             return true
         } catch (e: java.lang.Exception) {
             return false

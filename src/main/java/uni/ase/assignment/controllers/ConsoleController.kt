@@ -4,7 +4,18 @@ import javafx.scene.control.TextField
 import javafx.scene.paint.Color
 import java.util.*
 
+/**
+ * a controller for controlling the console, used for processing commands and accessing the command history from the
+ * [Canvas]
+ *
+ * @param cmd the [TextField] where commands are entered
+ * @param cc the [CanvasController] where the command history is stored
+ * @param log the [LogController] used for outputting messages and errors to the log
+ */
 class ConsoleController (val cmd: TextField, val cc: CanvasController, val log: LogController) {
+    /**
+     * if there is a command stored ahead of the current [cmdIndex] in the [cmdHist] array and puts it in the [cmd] [TextField]
+     */
     fun cmdLast() {
         if (cc.cmdIndex > 0 && cc.cmdHist.isNotEmpty()) {
             cmd.text = cc.cmdHist[cc.cmdIndex - 1]
@@ -13,12 +24,22 @@ class ConsoleController (val cmd: TextField, val cc: CanvasController, val log: 
             cmd.text = cc.cmdHist[0]
         }
     }
+
+    /**
+     * if there is a command stored behind of the current [cmdIndex] in the [cmdHist] array and puts it in the [cmd] [TextField]
+     */
     fun cmdNext() {
         if(cc.cmdIndex < cc.cmdHist.size-1 && cc.cmdHist.isNotEmpty()) {
             cmd.text = cc.cmdHist[cc.cmdIndex + 1]
             cc.cmdIndex += 1
         }
     }
+
+    /**
+     * runs a command either from the [custcmd] parameter or from the [cmd] [TextField] if [custcmd] is empty, splits the
+     * command by spaces and takes the first value from the array and uses it as the name of the command to find which
+     * function to run and uses the rest of the values in the array as the parameters for the function
+     */
     fun run(custcmd: String) {
         var cmdstr: String = if(custcmd == "") cmd.getText() else custcmd
         cmdstr = cmdstr.lowercase()
@@ -78,10 +99,10 @@ class ConsoleController (val cmd: TextField, val cc: CanvasController, val log: 
                 try {
                     if(cmdarr[1].startsWith("#")){
                         cc.setStrokeHex(cmdarr[1].trimStart())
-                        cc.setFillHex(cmdarr[1].trimStart())
+                        cc.setFillColHex(cmdarr[1].trimStart())
                     } else {
                         cc.setStroke(cmdarr[1])
-                        cc.setFill(cmdarr[1])
+                        cc.setFillCol(cmdarr[1])
                     }
                 } catch (e: Exception) {
                     log.error(e.toString())
@@ -105,9 +126,9 @@ class ConsoleController (val cmd: TextField, val cc: CanvasController, val log: 
             "fillcol" -> {
                 try {
                     if(cmdarr[1].startsWith("#")){
-                        cc.setFillHex(cmdarr[1].trimStart())
+                        cc.setFillColHex(cmdarr[1].trimStart())
                     } else {
-                        cc.setFill(cmdarr[1])
+                        cc.setFillCol(cmdarr[1])
                     }
                 } catch (e: Exception) {
                     log.error(e.toString())

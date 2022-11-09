@@ -124,9 +124,9 @@ public class MainController {
 
     /**
      * when the mouse is released this method checks the position of the mouse to decide if the window should snap to a
-     * certain position 
+     * certain position and size
      *
-     * @param e
+     * @param e for the position of the mouse
      */
     @FXML
     protected void mouseReleased(MouseEvent e) {
@@ -199,6 +199,12 @@ public class MainController {
             }
         }
     }
+
+    /**
+     * changes the fullscreen button icon when the window is not fullscreen
+     *
+     * @param e for the position of the mouse
+     */
     @FXML
     protected void mouseDragged(MouseEvent e) {
         if (fullscreenico == null) {
@@ -210,24 +216,43 @@ public class MainController {
         stage.setY(e.getScreenY() - y);
     }
 
+    /**
+     * handles minimizing the window
+     */
     @FXML
-    protected void minusMouseClicked(MouseEvent e) {
+    protected void minusMouseClicked() {
         stage.setIconified(true);
     }
+
+    /**
+     * changes colour of the minimize icon on mouse enter
+     *
+     * @param e the mouse event
+     */
     @FXML
     protected void minusMouseEntered(MouseEvent e) {
         FontIcon but = (FontIcon) e.getSource();
         but.setIconColor(Color.web("#00ff00"));
     }
+
+    /**
+     * changes colour of the minimize icon on mouse exit
+     *
+     * @param e the mouse event
+     */
     @FXML
     protected void minusMouseExited(MouseEvent e) {
         FontIcon but = (FontIcon) e.getSource();
         but.setIconColor(Color.WHITE);
     }
 
+    /**
+     * handles making the window fullscreen
+     *
+     * @param e the mouse event
+     */
     @FXML
     protected void fullscreenMouseClicked(MouseEvent e) {
-
         if (isMaximized) {
             AnchorPane but = (AnchorPane) e.getSource();
             FontIcon ico = (FontIcon) but.getChildren().get(0);
@@ -250,12 +275,24 @@ public class MainController {
             isMaximized = true;
         }
     }
+
+    /**
+     * changes colour of the fullscreen icon on mouse enter
+     *
+     * @param e the mouse event
+     */
     @FXML
     protected void fullscreenMouseEntered(MouseEvent e) {
         AnchorPane but = (AnchorPane) e.getSource();
         FontIcon ico = (FontIcon) but.getChildren().get(0);
         ico.setIconColor(Color.YELLOW);
     }
+
+    /**
+     * changes colour of the fullscreen icon on mouse exit
+     *
+     * @param e the mouse event
+     */
     @FXML
     protected void fullscreenMouseExited(MouseEvent e) {
         AnchorPane but = (AnchorPane) e.getSource();
@@ -263,15 +300,30 @@ public class MainController {
         ico.setIconColor(Color.WHITE);
     }
 
+    /**
+     * handles closing the application
+     */
     @FXML
-    protected void exitMouseClicked(MouseEvent e) {
+    protected void exitMouseClicked() {
         stage.close();
     }
+
+    /**
+     * changes colour of the exit icon on mouse enter
+     *
+     * @param e the mouse event
+     */
     @FXML
     protected void exitMouseEntered(MouseEvent e) {
         FontIcon but = (FontIcon) e.getSource();
         but.setIconColor(Color.RED);
     }
+
+    /**
+     * changes colour of the fullscreen icon on mouse exit
+     *
+     * @param e the mouse event
+     */
     @FXML
     protected void exitMouseExited(MouseEvent e) {
         FontIcon but = (FontIcon) e.getSource();

@@ -601,3 +601,164 @@ drawarc 200 100 100 100 90 80 round
 drawarc 200 100 100 100 90 90 round
 drawarc 200 100 100 100 80 90 round
 drawarc 200 100 100 100 0 90 round
+drawrect 100 100 100 100
+drawline 100 100 100 100
+drawoval 100 100 100 100
+drawpoly 100 100 100 5
+drawarc 100 100 100 100 90 90 chord
+drawarc 100 100 100 100 90 90 open
+drawarc 100 100 100 100 90 90 round
+stroke red
+stroke #696969
+fillcol red
+fillcol #420420
+fill
+drawrect 100 100 100 100
+drawline 100 100 100 100
+drawoval 100 100 100 100
+drawpoly 100 100 100 5
+drawarc 100 100 100 100 90 90 chord
+drawarc 100 100 100 100 90 90 open
+drawarc 100 100 100 100 90 90 round
+fill
+clear
+reset
+clear
+drawrect 100 100 100 100
+drawline 100 100 100 100
+drawoval 100 100 100 100
+drawpoly 100 100 100 5
+drawarc 100 100 100 100 90 90 chord
+drawarc 100 100 100 100 90 90 open
+drawarc 100 100 100 100 90 90 round
+stroke red
+stroke #696969
+fillcol blue
+fillcol #420420
+fill 
+drawrect 100 100 100 100
+drawline 100 100 100 100
+drawoval 100 100 100 100
+drawpoly 100 100 100 5
+drawarc 100 100 100 100 90 90 chord
+drawarc 100 100 100 100 90 90 open
+drawarc 100 100 100 100 90 90 round
+fill 
+clear 
+reset 
+clear
+drawrect 100 100 100 100
+drawline 100 100 100 100
+drawoval 100 100 100 100
+drawpoly 100 100 100 5
+drawarc 100 100 100 100 90 90 chord
+drawarc 100 100 100 100 90 90 open
+drawarc 100 100 100 100 90 90 round
+stroke red
+stroke #696969
+fillcol red
+fillcol #420420
+fill
+drawrect 100 100 100 100
+drawline 100 100 100 100
+drawoval 100 100 100 100
+drawpoly 100 100 100 5
+drawarc 100 100 100 100 90 90 chord
+drawarc 100 100 100 100 90 90 open
+drawarc 100 100 100 100 90 90 round
+fill
+clear
+reset
+clear
+drawrect 100 100 100 100
+drawline 100 100 100 100
+drawoval 100 100 100 100
+drawpoly 100 100 100 5
+drawarc 100 100 100 100 90 90 chord
+drawarc 100 100 100 100 90 90 open
+drawarc 100 100 100 100 90 90 round
+stroke red
+stroke #696969
+fillcol blue
+fillcol #420420
+fill 
+drawrect 100 100 100 100
+drawline 100 100 100 100
+drawoval 100 100 100 100
+drawpoly 100 100 100 5
+drawarc 100 100 100 100 90 90 chord
+drawarc 100 100 100 100 90 90 open
+drawarc 100 100 100 100 90 90 round
+fill 
+clear 
+reset 
+clear
+drawrect 100 100 100 100
+drawline 100 100 100 100
+drawoval 100 100 100 100
+drawpoly 100 100 100 5
+drawarc 100 100 100 100 90 90 chord
+drawarc 100 100 100 100 90 90 open
+drawarc 100 100 100 100 90 90 round
+stroke red
+stroke #696969
+fillcol red
+fillcol #420420
+fill
+drawrect 100 100 100 100
+drawline 100 100 100 100
+drawoval 100 100 100 100
+drawpoly 100 100 100 5
+drawarc 100 100 100 100 90 90 chord
+drawarc 100 100 100 100 90 90 open
+drawarc 100 100 100 100 90 90 round
+fill
+clear
+reset
+clear
+drawrect 100 100 100 100
+drawline 100 100 100 100
+drawoval 100 100 100 100
+drawpoly 100 100 100 5
+drawarc 100 100 100 100 90 90 chord
+drawarc 100 100 100 100 90 90 open
+drawarc 100 100 100 100 90 90 round
+stroke red
+stroke #696969
+fillcol blue
+fillcol #420420
+fill 
+drawrect 100 100 100 100
+drawline 100 100 100 100
+drawoval 100 100 100 100
+drawpoly 100 100 100 5
+drawarc 100 100 100 100 90 90 chord
+drawarc 100 100 100 100 90 90 open
+drawarc 100 100 100 100 90 90 round
+fill 
+clear 
+reset 
+clear
+drawrect 100 100 100 100
+drawline 100 100 100 100
+drawoval 100 100 100 100
+drawpoly 100 100 100 5
+drawarc 100 100 100 100 90 90 chord
+drawarc 100 100 100 100 90 90 open
+drawarc 100 100 100 100 90 90 round
+stroke red
+stroke #696969
+fillcol red
+fillcol #420420
+fill
+drawrect 100 100 100 100
+drawline 100 100 100 100
+drawoval 100 100 100 100
+drawpoly 100 100 100 5
+drawarc 100 100 100 100 90 90 chord
+drawarc 100 100 100 100 90 90 open
+drawarc 100 100 100 100 90 90 round
+fill
+clear
+reset
+clear
