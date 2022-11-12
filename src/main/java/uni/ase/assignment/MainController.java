@@ -16,10 +16,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
-import uni.ase.assignment.controllers.CanvasController;
-import uni.ase.assignment.controllers.CodeParser;
-import uni.ase.assignment.controllers.ConsoleController;
-import uni.ase.assignment.controllers.LogController;
+import uni.ase.assignment.controllers.*;
 
 /**
  * the Main Controller class which is used to process actions from the main window such as clicks or movements
@@ -29,23 +26,24 @@ public class MainController {
     double x,y;
     boolean isMaximized = false;
     Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
-    private Stage stage;
-    private FontIcon fullscreenico;
-    @FXML private FontIcon run;
-    @FXML private ImageView pen;
+    Stage stage;
+    FontIcon fullscreenico;
+    @FXML FontIcon run;
+    @FXML ImageView pen;
     @FXML TextArea code;
     @FXML TextArea out;
-    @FXML private Canvas canvas;
-    @FXML private TextField commandLine;
-    private LogController lc;
-    private CanvasController cac;
-    private CodeParser cp;
-    private ConsoleController coc;
+    @FXML Canvas canvas;
+    @FXML TextField commandLine;
+    LogController lc;
+    CanvasController cac;
+    CodeParser cp;
+    CodeController codc;
+    ConsoleController conc;
 
     /**
      * an event handler to be used for custom fullscreen functionality
      */
-    private EventHandler<MouseEvent> unMaximize = new EventHandler<MouseEvent>() {
+    EventHandler<MouseEvent> unMaximize = new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent e) {
             if (fullscreenico == null) {
@@ -67,9 +65,9 @@ public class MainController {
     };
 
     /**
-     * sets up and initialises some variables when the window is loaded, this is called from the [MainApplication] class
+     * sets up and initialises some variables when the window is loaded, this is called from the MainApplication class
      *
-     * @param stage
+     * @param stage the stage that will be rendered
      */
     public void setStage(Stage stage) {
         this.stage = stage;
@@ -79,8 +77,9 @@ public class MainController {
 
         lc = new LogController(out);
         cac = new CanvasController(canvas.getGraphicsContext2D(), lc);
-        coc = new ConsoleController(commandLine, cac, lc);
-        cp = new CodeParser(code, cac, lc, coc);
+        cp = new CodeParser(code, cac, lc, commandLine);
+        codc = new CodeController(code, cp, stage);
+        conc = new ConsoleController(commandLine, cac, lc, cp);
 
         pen.setX(0);
         pen.setY(0);
@@ -96,11 +95,11 @@ public class MainController {
     @FXML
     protected void cmdPressed(KeyEvent k) {
         if(k.getCode() == KeyCode.ENTER) {
-            coc.run("");
+            conc.run("");
         } else if (k.getCode() == KeyCode.UP) {
-            coc.cmdLast();
+            conc.cmdLast();
         } else if (k.getCode() == KeyCode.DOWN) {
-            coc.cmdNext();
+            conc.cmdNext();
         }
     }
 
@@ -109,6 +108,20 @@ public class MainController {
      */
     @FXML protected void runCode() {
         cp.run();
+    }
+
+    /**
+     * runs the code in the code textbox when the green play button above it is pressed
+     */
+    @FXML protected void save() {
+        codc.save();
+    }
+
+    /**
+     * runs the code in the code textbox when the green play button above it is pressed
+     */
+    @FXML protected void load() {
+        codc.load();
     }
 
     /**

@@ -1,6 +1,7 @@
 module uni.ase.assignment {
     requires javafx.controls;
     requires javafx.fxml;
+    requires javafx.graphics;
 
     requires org.kordamp.ikonli.javafx;
     requires org.fxmisc.richtext;

@@ -23,6 +23,16 @@
                                     <TextArea id="code" fx:id="code" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0" />
                                                 <HBox alignment="TOP_RIGHT" prefHeight="20.0" prefWidth="200.0" style="-fx-border-color: #cccccc; -fx-border-width: 0 0 1 0;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                     <children>
+                                          <FontIcon id="save" fx:id="save" iconColor="#aaaaaa" iconLiteral="bi-save2-fill" iconSize="15" layoutX="302.0" layoutY="27.0" onMouseClicked="#save">
+                                             <HBox.margin>
+                                                <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                             </HBox.margin>
+                                          </FontIcon>
+                                          <FontIcon id="load" fx:id="load" iconColor="#aaaaaa" iconLiteral="bi-folder-fill" iconSize="15" layoutX="304.0" layoutY="25.0" onMouseClicked="#load">
+                                             <HBox.margin>
+                                                <Insets bottom="2.0" left="2.0" right="20.0" top="2.0" />
+                                             </HBox.margin>
+                                          </FontIcon>
                                                         <FontIcon id="run" fx:id="run" iconColor="#00b500" iconLiteral="bi-triangle-fill" iconSize="15" onMouseClicked="#runCode" rotate="90.0">
                                                             <HBox.margin>
                                                                 <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />

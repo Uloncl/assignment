@@ -12,7 +12,7 @@ import java.util.*
  * @param cc the [CanvasController] where the command history is stored
  * @param log the [LogController] used for outputting messages and errors to the log
  */
-class ConsoleController (val cmd: TextField, val cc: CanvasController, val log: LogController) {
+class ConsoleController (val cmd: TextField, val cc: CanvasController, val log: LogController, val cp: CodeParser) {
     /**
      * if there is a command stored ahead of the current [cmdIndex] in the [cmdHist] array and puts it in the [cmd] [TextField]
      */
@@ -156,6 +156,7 @@ class ConsoleController (val cmd: TextField, val cc: CanvasController, val log: 
                 cc.fill = false
             }
             "clearlog" -> log.clear()
+            "run" -> cp.run()
              else -> {
                 log.error("command not recognised")
             }
