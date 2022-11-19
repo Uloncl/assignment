@@ -2,6 +2,7 @@ package uni.ase.assignment.controllers
 
 import javafx.scene.control.TextField
 import javafx.scene.paint.Color
+import uni.ase.assignment.shapes.Rectangle
 import java.util.*
 
 /**
@@ -42,64 +43,28 @@ class ConsoleController (val cmd: TextField, val cc: CanvasController, val log: 
      */
     fun run(custcmd: String) {
         var cmdstr: String = if(custcmd == "") cmd.getText() else custcmd
-        cmdstr = cmdstr.lowercase()
-        cmdstr = cmdstr.replace("  ", " ")
-        cmdstr = cmdstr.replace("(", "")
-        cmdstr = cmdstr.replace(")", "")
-        val cmdarr: List<String> = cmdstr.split(" ")
-        cc.cmdHistAppend(cmdarr.joinToString(separator = " "))
+        System.out.println("$cmdstr")
+        val cmdarr: List<String> = cmdstr.split(Regex("[^a-zA-Z0-9]")).filter { !it.isBlank() }
+        System.out.println("${cmdarr.size}")
+        cmdarr.forEach { System.out.println("$it") }
+        cc.cmdHistAppend(cmdstr)
         cc.cmdIndex = cc.cmdHist.size
-        when (cmdarr[0]) {
-            "drawoval" -> {
-                try {
-                    cc.DrawOval(cmdarr[1].toDouble(), cmdarr[2].toDouble(), cmdarr[3].toDouble(), cmdarr[4].toDouble())
-                } catch (e: Exception) {
-                    log.error(e.toString())
-                } finally {
-                    cmd.clear()
-                }
-            }
-            "drawrect" -> {
-                try {
-                    cc.DrawRect(cmdarr[1].toDouble(), cmdarr[2].toDouble(), cmdarr[3].toDouble(), cmdarr[4].toDouble())
-                } catch (e: Exception) {
-                    log.error(e.toString())
-                } finally {
-                    cmd.clear()
-                }
-            }
-            "drawline" -> {
-                try {
-                    cc.DrawLine(cmdarr[1].toDouble(), cmdarr[2].toDouble(), cmdarr[3].toDouble(), cmdarr[4].toDouble())
-                } catch (e: Exception) {
-                    log.error(e.toString())
-                } finally {
-                    cmd.clear()
-                }
-            }
-            "drawarc" -> {
-                try {
-                    cc.DrawArc(cmdarr[1].toDouble(), cmdarr[2].toDouble(), cmdarr[3].toDouble(), cmdarr[4].toDouble(), cmdarr[5].toDouble(), cmdarr[6].toDouble(), cmdarr[7])
-                } catch (e: Exception) {
-                    log.error(e.toString())
-                } finally {
-                    cmd.clear()
-                }
-            }
-            "drawpoly" -> {
-                try {
-                    cc.DrawPoly(cmdarr[1].toDouble(), cmdarr[2].toDouble(), cmdarr[3].toDouble(), cmdarr[4].toDouble())
-                } catch (e: Exception) {
-                    log.error(e.toString())
-                } finally {
-                    cmd.clear()
-                }
-            }
-            "pen" -> {
+        when {
+            cmdstr.startsWith("oval")      -> cc.DrawOval(cmdarr)
+            cmdstr.startsWith("circle")    -> cc.DrawCircle(cmdarr)
+            cmdstr.startsWith("rect")      -> cc.DrawRect(cmdarr)
+            cmdstr.startsWith("square")    -> cc.DrawSquare(cmdarr)
+            cmdstr.startsWith("line")      -> cc.DrawLine(cmdarr)
+            cmdstr.startsWith("arc")       -> cc.DrawArc(cmdarr)
+            cmdstr.startsWith("polygon")   -> cc.DrawPolygon(cmdarr)
+            cmdstr.startsWith("polyline")  -> cc.DrawPolyline(cmdarr)
+            cmdstr.startsWith("triangle")  -> cc.DrawTriangle(cmdarr)
+            cmdstr.startsWith("text")      -> cc.DrawText(cmdarr)
+            cmdstr.startsWith("pen")       -> {
                 try {
                     if(cmdarr[1].startsWith("#")){
-                        cc.setStrokeHex(cmdarr[1].trimStart())
-                        cc.setFillColHex(cmdarr[1].trimStart())
+                        cc.setStroke(cmdarr[1].trimStart())
+                        cc.setFillCol(cmdarr[1].trimStart())
                     } else {
                         cc.setStroke(cmdarr[1])
                         cc.setFillCol(cmdarr[1])
@@ -110,10 +75,10 @@ class ConsoleController (val cmd: TextField, val cc: CanvasController, val log: 
                     cmd.clear()
                 }
             }
-            "stroke" -> {
+            cmdstr.startsWith("stroke") -> {
                 try {
                     if(cmdarr[1].startsWith("#")){
-                        cc.setStrokeHex(cmdarr[1].trimStart())
+                        cc.setStroke(cmdarr[1].trimStart())
                     } else {
                         cc.setStroke(cmdarr[1])
                     }
@@ -123,10 +88,10 @@ class ConsoleController (val cmd: TextField, val cc: CanvasController, val log: 
                     cmd.clear()
                 }
             }
-            "fillcol" -> {
+            cmdstr.startsWith("fillcol") -> {
                 try {
                     if(cmdarr[1].startsWith("#")){
-                        cc.setFillColHex(cmdarr[1].trimStart())
+                        cc.setFillCol(cmdarr[1].trimStart())
                     } else {
                         cc.setFillCol(cmdarr[1])
                     }
@@ -136,27 +101,33 @@ class ConsoleController (val cmd: TextField, val cc: CanvasController, val log: 
                     cmd.clear()
                 }
             }
-            "fill" -> {
+            cmdstr.startsWith("fill") -> {
                 cc.fill = !cc.fill
             }
-            "clear" -> {
-                var olfill = cc.fill
-                var olcol = cc.g.fill
-                cc.fill = true
-                cc.g.fill = Color.web("0x333333")
-                cc.DrawRect(0.0, 0.0, 10000.0, 10000.0)
-                cc.g.fill = olcol
-                cc.fill = olfill
+            cmdstr.startsWith("clear") -> {
+                Rectangle(
+                    log,
+                    cc.g,
+                    0.0,
+                    0.0,
+                    10000.0,
+                    10000.0,
+                    false,
+                    0.0,
+                    true,
+                    Color.web("#333333"),
+                    Color.web("#333333")
+                ).draw()
                 cmd.clear()
             }
-            "reset" -> {
+            cmdstr.startsWith("reset") -> {
                 run("clear")
                 cc.g.fill = Color.web("0xcccccc")
                 cc.g.stroke = Color.web("0xcccccc")
                 cc.fill = false
             }
-            "clearlog" -> log.clear()
-            "run" -> cp.run()
+            cmdstr.startsWith("clearlog") -> log.clear()
+            cmdstr.startsWith("run") -> cp.run()
              else -> {
                 log.error("command not recognised")
             }

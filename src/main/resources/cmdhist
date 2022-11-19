@@ -3234,3 +3234,69 @@ fill
 clear
 reset
 clear
+fill
+drawarc 100 100 100 100 0 90 open
+drawarc 100 100 100 100 0 90 round
+drawarc 100 100 100 100 0 90 chord
+clear
+oval 10 100 350 420 true #696969 #420420
+oval 10 100 30 40 true #696969 #420420
+oval 10 100 30 40 true
+oval 10 100 30 40 true #420420
+oval 10 100 30 40 true #420420
+oval 10 100 30 40 true #42042069
+oval 10 100 30 40 true #42042069 #69694250
+oval 100 100 30 40 true #42042069 #69694250
+oval 100 200 100 200 false #696969
+rectangle 100 100 100 200
+rect 100 100 100 200
+rect 100 100 200 200 fill #ff0000aa #00ff00aa
+rect 100 100 200 200 fill #ff0000 #00ff00aa
+rect 100 100 200 200 fill #ff0000 #00ff00
+rect 100 100 200 200 true 25 true #ff0000 #00ff00
+rect 0 0 100 100 true 25 true #ff0000aa #00ff00aa
+rect 0 0 100 100 true #ff0000aa #00ff00aa true
+rect 0 0 100 100 true #ff0000aa #00ff00aa true
+rect 10 0 100 100 true #ff0000aa #00ff00aa true 30
+rect 0 10 100 100 true #ff0000aa #00ff00aa true 100
+rect 10 10 100 100 true #ff0000aa #00ff00aa true 50
+rect 20 0 100 100 true #0000ff55 #00ff0055 true 50
+rect 20 0 100 100 true #0000ff55 #0ff00055 true 50
+rect 0 20 100 100 true #0000ff55 #0ff00055 true 50
+rect 100 100 100 100 true #0000ff55 #0ff00055 true 50
+rect 100 100 100 100 true #0000ff55 #0ff00f55 true 50
+rect 100 200 100 100 true #0000ff55 #0ff00f55 true 50
+rect 100 200 100 100 true #0000ff55 #0ff00f55 true 50
+rect 100 200 100 100 true #0000ff55 #0ff0ff55 true 50
+rect 200 100 100 100 true #0000ff55 #0ff0ff55 true 50
+rect 200 200 100 100 true #0000ff55 #ff00ff55 true 50
+circle 100 100 50
+circle 100 200 50 true #69696969 #42042069
+circle 200 100 50 true
+circle 200 200 50 true #42042069
+circle 0 0 50 false #42042069
+circle 50 50 50 false #42042069
+circle 50 150 50 false #42042069
+circle 150 50 50 false #42042069 #69696969
+circle 150 50 50 true #42042069 #69696969
+rect 100 100 100 100
+rect 100 100 100 100
+rect                
+rect        
+rect                
+rect                
+rect 100 100 100 100
+rect 100 100 100 100
+rect 100 100 100 100
+rect100  100, 100, 100
+rect100  100, 100, 100
+rect100  100, 100, 100
+rect100  100, 100, 100
+rect100 100  100  100
+rect100  100  100  100
+rect(100, 100, 100, 100)
+rect(100, 100, 100, 100)
+rect(100, 100, 100, 100)
+rect(100, 100, 100, 100)
+rect(100, 100, 100, 100)
+rect(100, 100, 100, 100)

@@ -3,7 +3,9 @@ package uni.ase.assignment.controllers
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import javafx.scene.shape.ArcType
+import uni.ase.assignment.shapes.*
 import java.io.File
+import java.util.*
 
 /**
  * the canvas controller that allows and controls drawing on the canvas
@@ -20,8 +22,8 @@ class CanvasController(val g: GraphicsContext, val log: LogController) {
      * initializes the class with a light grey colour and reading the command history from the file where it is stored
      */
     init {
-        g.fill = Color.web("0xCCCCCC")
-        g.stroke = Color.web("0xCCCCCC")
+        g.fill = Color.web("#CCCCCC")
+        g.stroke = Color.web("#CCCCCC")
         cmdHistFile.forEachLine { cmdHist.add(it) }
         cmdHist.add("")
         cmdIndex = cmdHist.size-1
@@ -38,14 +40,19 @@ class CanvasController(val g: GraphicsContext, val log: LogController) {
      * clears the canvas
      */
     fun clear() {
-        fill = true
-        var olfill = g.fill
-        var olstroke = g.stroke
-        g.fill = Color.web("0x333333")
-        g.stroke = Color.web("0x333333")
-        DrawRect(0.0, 0.0, 10000.0, 10000.0)
-        g.fill = olfill
-        g.stroke = olstroke
+        Rectangle(
+            log,
+            g,
+            0.0,
+            0.0,
+            10000.0,
+            10000.0,
+            false,
+            0.0,
+            true,
+            Color.web("#333333"),
+            Color.web("#333333")
+        ).draw()
     }
 
     /**
@@ -53,8 +60,8 @@ class CanvasController(val g: GraphicsContext, val log: LogController) {
      */
     fun reset() {
         clear()
-        g.fill = Color.web("0xCCCCCC")
-        g.stroke = Color.web("0xCCCCCC")
+        g.fill = Color.web("#CCCCCC")
+        g.stroke = Color.web("#CCCCCC")
     }
 
     /**
@@ -68,35 +75,297 @@ class CanvasController(val g: GraphicsContext, val log: LogController) {
     /**
      * draws an oval with the coordinates [x], [y] and size [h] x [w]
      */
-    fun DrawOval(x: Double, y: Double, w: Double, h: Double) {
-        if (fill) {
-            g.fillOval(x, y, w, h)
-            g.strokeOval(x, y, w, h)
-        } else {
-            g.strokeOval(x, y, w, h)
+    fun DrawOval(params: List<String>) {
+        try {
+            when (params.size) {
+                1 -> log.error("not enough parameters")
+                2 -> log.error("not enough parameters")
+                3 -> log.error("not enough parameters")
+                4 -> log.error("not enough parameters")
+                5 -> Oval(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    w = params[3].toDouble(),
+                    h = params[4].toDouble()
+                ).draw()
+                6 -> Oval(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    w = params[3].toDouble(),
+                    h = params[4].toDouble(),
+                    fill = params[5].toBoolean()
+                ).draw()
+                7 -> Oval(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    w = params[3].toDouble(),
+                    h = params[4].toDouble(),
+                    fill = params[5].toBoolean(),
+                    strokeCol = Color.web(getHex(params[6]))
+                ).draw()
+                8 -> Oval(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    w = params[3].toDouble(),
+                    h = params[4].toDouble(),
+                    fill = params[5].toBoolean(),
+                    strokeCol = Color.web(getHex(params[6])),
+                    fillCol = Color.web(getHex(params[7]))
+                ).draw()
+                else -> log.error("incorrect number of parameters")
+            }
+        } catch (e : Exception) {
+            log.error(e.toString())
+        } catch (e : java.lang.Exception) {
+            log.error(e.toString())
         }
-        log.out("Oval drawn at $x, $y with size: $w x $h")
+    }
+
+    /**
+     * draws an oval with the coordinates [x], [y] and size [h] x [w]
+     */
+    fun DrawCircle(params: List<String>) {
+        try {
+            when (params.size) {
+                1 -> log.error("not enough parameters")
+                2 -> log.error("not enough parameters")
+                3 -> log.error("not enough parameters")
+                4 -> Circle(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    r = params[3].toDouble()
+                ).draw()
+                5 -> Circle(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    r = params[3].toDouble(),
+                    fill = params[4].toBoolean()
+                ).draw()
+                6 -> Circle(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    r = params[3].toDouble(),
+                    fill = params[4].toBoolean(),
+                    strokeCol = Color.web(getHex(params[5]))
+                ).draw()
+                7 -> Circle(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    r = params[3].toDouble(),
+                    fill = params[4].toBoolean(),
+                    strokeCol = Color.web(getHex(params[5])),
+                    fillCol = Color.web(getHex(params[6]))
+                ).draw()
+                else -> log.error("incorrect number of parameters")
+            }
+        } catch (e : Exception) {
+            log.error(e.toString())
+        } catch (e : java.lang.Exception) {
+            log.error(e.toString())
+        }
     }
 
     /**
      * draws a rectangle with the coordinates [x], [y] and size [h] x [w]
      */
-    fun DrawRect(x: Double, y: Double, w: Double, h: Double) {
-        if (fill) {
-            g.fillRect(x, y, w, h)
-            g.strokeRect(x, y, w, h)
-        } else {
-            g.strokeRect(x, y, w, h)
+    fun DrawRect(params: List<String>) {
+        try {
+            when (params.size) {
+                1 -> log.error("not enough parameters")
+                2 -> log.error("not enough parameters")
+                3 -> log.error("not enough parameters")
+                4 -> log.error("not enough parameters")
+                5 -> Rectangle(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    w = params[3].toDouble(),
+                    h = params[4].toDouble()
+                ).draw()
+                6 -> Rectangle(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    w = params[3].toDouble(),
+                    h = params[4].toDouble(),
+                    fill = params[5].toBoolean()
+                ).draw()
+                7 -> Rectangle(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    w = params[3].toDouble(),
+                    h = params[4].toDouble(),
+                    fill = params[5].toBoolean(),
+                    strokeCol = Color.web(getHex(params[6]))
+                ).draw()
+                8 -> Rectangle(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    w = params[3].toDouble(),
+                    h = params[4].toDouble(),
+                    fill = params[5].toBoolean(),
+                    strokeCol = Color.web(getHex(params[6])),
+                    fillCol = Color.web(getHex(params[7]))
+                ).draw()
+                9 -> Rectangle(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    w = params[3].toDouble(),
+                    h = params[4].toDouble(),
+                    fill = params[5].toBoolean(),
+                    strokeCol = Color.web(getHex(params[6])),
+                    fillCol = Color.web(getHex(params[7])),
+                    rounded = params[8].toBoolean()
+                ).draw()
+                10 -> Rectangle(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    w = params[3].toDouble(),
+                    h = params[4].toDouble(),
+                    fill = params[5].toBoolean(),
+                    strokeCol = Color.web(getHex(params[6])),
+                    fillCol = Color.web(getHex(params[7])),
+                    rounded = params[8].toBoolean(),
+                    cornerSize = params[9].toDouble()
+                ).draw()
+                else -> log.error("incorrect number of parameters")
+            }
+        } catch (e : Exception) {
+            log.error(e.toString())
+        } catch (e : java.lang.Exception) {
+            log.error(e.toString())
         }
-        log.out("Rectangle drawn at $x, $y with size: $w x $h")
+    }
+
+    /**
+     * draws an oval with the coordinates [x], [y] and size [h] x [w]
+     */
+    fun DrawSquare(params: List<String>) {
+        try {
+            when (params.size) {
+                1 -> log.error("not enough parameters")
+                2 -> log.error("not enough parameters")
+                3 -> log.error("not enough parameters")
+                4 -> log.error("not enough parameters")
+                5 -> Square(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    size = params[3].toDouble(),
+                    fill = params[4].toBoolean()
+                ).draw()
+                6 -> Square(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    size = params[3].toDouble(),
+                    fill = params[4].toBoolean(),
+                    strokeCol = Color.web(getHex(params[5]))
+                ).draw()
+                7 -> Square(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    size = params[3].toDouble(),
+                    fill = params[4].toBoolean(),
+                    strokeCol = Color.web(getHex(params[5])),
+                    fillCol = Color.web(getHex(params[6])),
+                ).draw()
+                8 -> Square(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    size = params[3].toDouble(),
+                    fill = params[4].toBoolean(),
+                    strokeCol = Color.web(getHex(params[5])),
+                    fillCol = Color.web(getHex(params[6])),
+                    rounded = params[7].toBoolean()
+                ).draw()
+                9 -> Square(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    size = params[3].toDouble(),
+                    fill = params[4].toBoolean(),
+                    strokeCol = Color.web(getHex(params[5])),
+                    fillCol = Color.web(getHex(params[6])),
+                    rounded = params[7].toBoolean(),
+                    cornerSize = params[8].toDouble()
+                ).draw()
+                else -> log.error("incorrect number of parameters")
+            }
+        } catch (e : Exception) {
+            log.error(e.toString())
+        } catch (e : java.lang.Exception) {
+            log.error(e.toString())
+        }
     }
 
     /**
      * draws a line from the coordinates [x1], [y2] to [x2], [y2]
      */
-    fun DrawLine(x1: Double, y1: Double, x2: Double, y2: Double) {
-        g.strokeLine(x1, y1, x2, y2)
-        log.out("line drawn from $x1, $y1 to $x2, $y2")
+    fun DrawLine(params: List<String>) {
+        try {
+            when (params.size) {
+                1 -> log.error("not enough parameters")
+                2 -> log.error("not enough parameters")
+                3 -> log.error("not enough parameters")
+                4 -> log.error("not enough parameters")
+                5 -> Line(
+                    log,
+                    g,
+                    x1 = params[1].toDouble(),
+                    y1 = params[2].toDouble(),
+                    x2 = params[3].toDouble(),
+                    y2 = params[4].toDouble()
+                ).draw()
+                6 -> Line(
+                    log,
+                    g,
+                    x1 = params[1].toDouble(),
+                    y1 = params[2].toDouble(),
+                    x2 = params[3].toDouble(),
+                    y2 = params[4].toDouble(),
+                    strokeCol = Color.web(getHex(params[5]))
+                ).draw()
+                else -> log.error("incorrect number of parameters")
+            }
+        } catch (e : Exception) {
+            log.error(e.toString())
+        } catch (e : java.lang.Exception) {
+            log.error(e.toString())
+        }
     }
 
     /**
@@ -105,184 +374,411 @@ class CanvasController(val g: GraphicsContext, val log: LogController) {
      * either be left open with only the arc being drawn, it can be a chord where the 2 ends of the arc are connected
      * directly or round where it is connected like a pizza slice where the 2 ends of the arc are connected to the center
      */
-    fun DrawArc(x: Double, y: Double, w: Double, h: Double, startAngle: Double, arcExtent: Double, closure: String) {
-        var arcType: ArcType? = when (closure) {
-            "chord" -> ArcType.CHORD
-            "open" -> ArcType.OPEN
-            "round" -> ArcType.ROUND
-            else -> null
+    fun DrawArc(params: List<String>) {
+        try {
+            when (params.size) {
+                1 -> log.error("not enough parameters")
+                2 -> log.error("not enough parameters")
+                3 -> log.error("not enough parameters")
+                4 -> log.error("not enough parameters")
+                5 -> Arc(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    w = params[3].toDouble(),
+                    h = params[4].toDouble()
+                ).draw()
+                6 -> Arc(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    w = params[3].toDouble(),
+                    h = params[4].toDouble(),
+                    startAngle = params[5].toDouble()
+                ).draw()
+                7 -> Arc(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    w = params[3].toDouble(),
+                    h = params[4].toDouble(),
+                    startAngle = params[5].toDouble(),
+                    endAngle = params[6].toDouble()
+                ).draw()
+                8 -> Arc(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    w = params[3].toDouble(),
+                    h = params[4].toDouble(),
+                    startAngle = params[5].toDouble(),
+                    endAngle = params[6].toDouble(),
+                    closingMethod = ArcType.OPEN
+                ).draw()
+                9 -> Arc(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    w = params[3].toDouble(),
+                    h = params[4].toDouble(),
+                    startAngle = params[5].toDouble(),
+                    endAngle = params[6].toDouble(),
+                    closingMethod = ArcType.OPEN,
+                    strokeCol = Color.web(getHex(params[8]))
+                ).draw()
+                else -> log.error("incorrect number of parameters")
+            }
+        } catch (e : Exception) {
+            log.error(e.toString())
+        } catch (e : java.lang.Exception) {
+            log.error(e.toString())
         }
-        g.strokeArc(x, y, w, h, startAngle, arcExtent, arcType)
-        log.out("Arc drawn at $x, $y size: $h x $w start angle: $startAngle arc extent: $arcExtent closure: $closure")
     }
 
     /**
      * draws a polygon with the center coordinates [x], [y], radius [r] and number of sides [n]
      */
-    fun DrawPoly(x: Double, y: Double, r: Double, n: Double) {
-        log.out("")
-        val xp = mutableListOf<Double>()
-        val yp = mutableListOf<Double>()
-        var i = 0
-        while (i < n) {
-            xp.add(i, x + (r * Math.cos(2 * Math.PI * i / n)))
-            yp.add(i, y + (r * Math.sin(2 * Math.PI * i / n)))
-            i++
+    fun DrawPolygon(params: List<String>) {
+        try {
+            when (params.size) {
+                1 -> log.error("not enough parameters")
+                2 -> log.error("not enough parameters")
+                3 -> log.error("not enough parameters")
+                4 -> log.error("not enough parameters")
+                5 -> Polygon(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    r = params[3].toDouble(),
+                    n = params[4].toInt()
+                ).draw()
+                6 -> Polygon(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    r = params[3].toDouble(),
+                    n = params[4].toInt(),
+                    preset = PolygonPreset.NONE
+                ).draw()
+                7 -> Polygon(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    r = params[3].toDouble(),
+                    n = params[4].toInt(),
+                    preset = PolygonPreset.NONE,
+                    fill = params[6].toBoolean()
+                ).draw()
+                8 -> Polygon(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    r = params[3].toDouble(),
+                    n = params[4].toInt(),
+                    preset = PolygonPreset.NONE,
+                    fill = params[6].toBoolean(),
+                    strokeCol = Color.web(getHex(params[7]))
+                ).draw()
+                9 -> Polygon(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    r = params[3].toDouble(),
+                    n = params[4].toInt(),
+                    preset = PolygonPreset.NONE,
+                    fill = params[6].toBoolean(),
+                    strokeCol = Color.web(getHex(params[7])),
+                    fillCol = Color.web(getHex(params[8]))
+                ).draw()
+                else -> log.error("incorrect number of parameters")
+            }
+        } catch (e : Exception) {
+            log.error(e.toString())
+        } catch (e : java.lang.Exception) {
+            log.error(e.toString())
         }
-        if (fill) {
-            g.fillPolygon(xp.toDoubleArray(), yp.toDoubleArray(), n.toInt())
-            g.strokePolygon(xp.toDoubleArray(), yp.toDoubleArray(), n.toInt())
-        } else {
-            g.strokePolygon(xp.toDoubleArray(), yp.toDoubleArray(), n.toInt())
-        }
-        log.out("polygon drawn at $x, $y with a radius to vertices of $r and $n sides")
     }
 
     /**
-     * sets the colour of all lines and edges of shapes drawn with the [hex] colour passed
+     * draws an oval with the coordinates [x], [y] and size [h] x [w]
      */
-    fun setStrokeHex(hex: String) {
-        if(hex.drop(1).uppercase().matches(Regex("^[0-9A-F]+$")) && hex.length == 7) {
-            g.stroke = Color.web("0x${hex.drop(1)}")
-            log.out("stroke colour changed to $hex")
-        } else {
-            log.error("hex code invalid")
+    fun DrawPolyline(params : List<String>) {
+        try {
+            when (params.size) {
+                1 -> log.error("not enough parameters")
+                2 -> log.error("not enough parameters")
+                3 -> log.error("not enough parameters")
+                4 -> log.error("not enough parameters")
+                5 -> Polyline(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    r = params[3].toDouble(),
+                    n = params[4].toInt()
+                ).draw()
+                6 -> Polyline(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    r = params[3].toDouble(),
+                    n = params[4].toInt(),
+                    preset = PolylinePreset.NONE
+                ).draw()
+                7 -> Polyline(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    r = params[3].toDouble(),
+                    n = params[4].toInt(),
+                    preset = PolylinePreset.NONE,
+                    strokeCol = Color.web(getHex(params[6]))
+                ).draw()
+                else -> log.error("incorrect number of parameters")
+            }
+        } catch (e : Exception) {
+            log.error(e.toString())
+        } catch (e : java.lang.Exception) {
+            log.error(e.toString())
+        }
+    }
+
+    /**
+     * draws an oval with the coordinates [x], [y] and size [h] x [w]
+     */
+    fun DrawTriangle(params : List<String>) {
+        try {
+            when (params.size) {
+                1 -> log.error("not enough parameters")
+                2 -> log.error("not enough parameters")
+                3 -> log.error("not enough parameters")
+                4 -> Triangle(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    randomised = params[3].toBoolean()
+                ).draw()
+                5 -> Triangle(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    randomised = params[3].toBoolean(),
+                    points = mapOf(0.0 to 0.0, 0.0 to 0.0, 0.0 to 0.0)
+                ).draw()
+                6 -> Triangle(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    randomised = params[3].toBoolean(),
+                    points = mapOf(0.0 to 0.0, 0.0 to 0.0, 0.0 to 0.0),
+                    radius = params[5].toDouble()
+                ).draw()
+                7 -> Triangle(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    randomised = params[3].toBoolean(),
+                    points = mapOf(0.0 to 0.0, 0.0 to 0.0, 0.0 to 0.0),
+                    radius = params[5].toDouble(),
+                    triType = TriType.EQUILATERAL
+                ).draw()
+                8 -> Triangle(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    randomised = params[3].toBoolean(),
+                    points = mapOf(0.0 to 0.0, 0.0 to 0.0, 0.0 to 0.0),
+                    radius = params[5].toDouble(),
+                    triType = TriType.EQUILATERAL,
+                    fill = params[7].toBoolean()
+                ).draw()
+                9 -> Triangle(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    randomised = params[3].toBoolean(),
+                    points = mapOf(0.0 to 0.0, 0.0 to 0.0, 0.0 to 0.0),
+                    radius = params[5].toDouble(),
+                    triType = TriType.EQUILATERAL,
+                    fill = params[7].toBoolean(),
+                    strokeCol = Color.web(getHex(params[8]))
+                ).draw()
+                10 -> Triangle(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    randomised = params[3].toBoolean(),
+                    points = mapOf(0.0 to 0.0, 0.0 to 0.0, 0.0 to 0.0),
+                    radius = params[5].toDouble(),
+                    triType = TriType.EQUILATERAL,
+                    fill = params[7].toBoolean(),
+                    strokeCol = Color.web(getHex(params[8])),
+                    fillCol = Color.web(getHex(params[9])),
+                ).draw()
+                else -> log.error("incorrect number of parameters")
+            }
+        } catch (e : Exception) {
+            log.error(e.toString())
+        } catch (e : java.lang.Exception) {
+            log.error(e.toString())
+        }
+    }
+
+    /**
+     * draws an oval with the coordinates [x], [y] and size [h] x [w]
+     */
+    fun DrawText(params : List<String>) {
+        try {
+            when (params.size) {
+                1 -> log.error("not enough parameters")
+                2 -> log.error("not enough parameters")
+                3 -> log.error("not enough parameters")
+                4 -> Text(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    text = params[3]
+                ).draw()
+                5 -> Text(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    text = params[3],
+                    fill = params[4].toBoolean()
+                ).draw()
+                6 -> Text(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    text = params[3],
+                    fill = params[4].toBoolean(),
+                    strokeCol = Color.web(getHex(params[5]))
+                ).draw()
+                7 -> Text(
+                    log,
+                    g,
+                    x = params[1].toDouble(),
+                    y = params[2].toDouble(),
+                    text = params[3],
+                    fill = params[4].toBoolean(),
+                    strokeCol = Color.web(getHex(params[5])),
+                    fillCol = Color.web(getHex(params[6])),
+                ).draw()
+                else -> log.error("incorrect number of parameters")
+            }
+        } catch (e : Exception) {
+            log.error(e.toString())
+        } catch (e : java.lang.Exception) {
+            log.error(e.toString())
         }
     }
 
     /**
      * sets the [colour] of all lines and edges of shapes drawn from some preset colours
      */
-    fun setStroke(color: String) {
-        var color = color.lowercase()
-        when(color) {
+    fun getHex(colour: String) : String {
+        var colour = colour.lowercase()
+        when(colour) {
             "white" -> {
-                setStrokeHex("#ffffff")
-                log.out("stroke colour changed to $color")
+                log.out("stroke colour changed to $colour")
+                return "#ffffff"
             }
             "black" -> {
-                setStrokeHex("#000000")
-                log.out("stroke colour changed to $color")
+                log.out("stroke colour changed to $colour")
+                return "#000000"
             }
             "lightgray" -> {
-                setStrokeHex("#bbbbbb")
-                log.out("stroke colour changed to $color")
+                log.out("stroke colour changed to $colour")
+                return "#bbbbbb"
             }
             "gray" -> {
-                setStrokeHex("#888888")
-                log.out("stroke colour changed to $color")
+                log.out("stroke colour changed to $colour")
+                return "#888888"
             }
             "darkgray" -> {
-                setStrokeHex("#444444")
-                log.out("stroke colour changed to $color")
+                log.out("stroke colour changed to $colour")
+                return "#444444"
             }
             "red" -> {
-                setStrokeHex("#ff0000")
-                log.out("stroke colour changed to $color")
+                log.out("stroke colour changed to $colour")
+                return "#ff0000"
             }
             "blue" -> {
-                setStrokeHex("#0000ff")
-                log.out("stroke colour changed to $color")
+                log.out("stroke colour changed to $colour")
+                return "#0000ff"
             }
             "green" -> {
-                setStrokeHex("#00ff00")
-                log.out("stroke colour changed to $color")
+                log.out("stroke colour changed to $colour")
+                return "#00ff00"
             }
             "yellow" -> {
-                setStrokeHex("#ffff00")
-                log.out("stroke colour changed to $color")
+                log.out("stroke colour changed to $colour")
+                return "#ffff00"
             }
             "orange" -> {
-                setStrokeHex("#ffa500")
-                log.out("stroke colour changed to $color")
+                log.out("stroke colour changed to $colour")
+                return "#ffa500"
             }
             "cyan" -> {
-                setStrokeHex("#00ffff")
-                log.out("stroke colour changed to $color")
+                log.out("stroke colour changed to $colour")
+                return "#00ffff"
             }
             "purple" -> {
-                setStrokeHex("#8e44ad")
-                log.out("stroke colour changed to $color")
+                log.out("stroke colour changed to $colour")
+                return "#8e44ad"
             }
             "pink" -> {
-                setStrokeHex("#ff55ff")
-                log.out("stroke colour changed to $color")
+                log.out("stroke colour changed to $colour")
+                return "#ff55ff"
             }
-            else -> log.error("colour preset not found")
+            else -> {
+                if (colour.startsWith("#")) {
+                    return colour
+                } else {
+                    return ""
+                    log.error("invalid colour")
+                }
+            }
         }
+    }
+
+    /**
+     * sets the colour of all lines and edges of shapes drawn with the [hex] colour passed
+     */
+    fun setStroke(colour: String) {
+        var colour = getHex(colour)
+        g.stroke = Color.web(getHex(colour))
+        log.out("stroke colour changed to $colour")
     }
 
     /**
      * set the colours of any shapes drawn while [fill] is true from a [hex] value
      */
-    fun setFillColHex(hex: String) {
-        if(hex.drop(1).uppercase().matches(Regex("^[0-9A-F]+$")) && hex.length == 7) {
-            g.fill = Color.web("0x${hex.drop(1)}")
-            log.out("fill colour changed to $hex")
-        } else {
-            log.error("hex code invalid")
-        }
-    }
-
-    /**
-     * sets the [colour] of any shapes drawn while [fill] is true from some preset colours
-     */
-    fun setFillCol(color: String) {
-        var color = color.lowercase()
-        when(color) {
-            "white" -> {
-                setFillColHex("#ffffff")
-                log.out("fill colour changed to $color")
-            }
-            "black" -> {
-                setFillColHex("#000000")
-                log.out("fill colour changed to $color")
-            }
-            "lightgray" -> {
-                setFillColHex("#bbbbbb")
-                log.out("fill colour changed to $color")
-            }
-            "gray" -> {
-                setFillColHex("#888888")
-                log.out("fill colour changed to $color")
-            }
-            "darkgray" -> {
-                setFillColHex("#444444")
-                log.out("fill colour changed to $color")
-            }
-            "red" -> {
-                setFillColHex("#ff0000")
-                log.out("fill colour changed to $color")
-            }
-            "blue" -> {
-                setFillColHex("#0000ff")
-                log.out("fill colour changed to $color")
-            }
-            "green" -> {
-                setFillColHex("#00ff00")
-                log.out("fill colour changed to $color")
-            }
-            "yellow" -> {
-                setFillColHex("#ffff00")
-                log.out("fill colour changed to $color")
-            }
-            "orange" -> {
-                setFillColHex("#ffa500")
-                log.out("fill colour changed to $color")
-            }
-            "cyan" -> {
-                setFillColHex("#00ffff")
-                log.out("fill colour changed to $color")
-            }
-            "purple" -> {
-                setFillColHex("#8e44ad")
-                log.out("fill colour changed to $color")
-            }
-            "pink" -> {
-                setFillColHex("#ff55ff")
-                log.out("fill colour changed to $color")
-            }
-            else -> log.error("colour preset not found")
-        }
+    fun setFillCol(colour: String) {
+        var colour = getHex(colour)
+        g.fill = Color.web(getHex(colour))
+        log.out("stroke colour changed to $colour")
     }
 }

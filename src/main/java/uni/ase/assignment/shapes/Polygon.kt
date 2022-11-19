@@ -1,24 +1,58 @@
 package uni.ase.assignment.shapes
 
 import javafx.scene.canvas.GraphicsContext
+import javafx.scene.paint.Color
 import uni.ase.assignment.controllers.LogController
 
 class Polygon(
     log : LogController,
     g: GraphicsContext,
-    x : Int = 0,
-    y : Int = 0,
-    var r : Int = 0,
+    x : Double = 0.0,
+    y : Double = 0.0,
+    var r : Double = 0.0,
     var n : Int = 3,
-    var preset : PolygonPreset = PolygonPreset.NONE
+    var preset : PolygonPreset = PolygonPreset.NONE,
+    var fill: Boolean? = false,
+    var strokeCol: Color? = null,
+    var fillCol: Color? = null
 ) : Shape(log, g, x, y) {
-    init {
-        if (n < 3) {
-            log.error("number of sides cannot be less than 3")
+    override var out : String = "Polygon drawn at $x, $y"
+    protected var xp = mutableListOf<Double>()
+    protected var yp = mutableListOf<Double>()
+
+    protected fun generatePoints() {
+        var i = 0
+        while (i < n) {
+            xp.add(i, x + (r * Math.cos(2 * Math.PI * i / n)))
+            yp.add(i, y + (r * Math.sin(2 * Math.PI * i / n)))
+            i++
         }
     }
+
     override fun draw() {
-        TODO("Not yet implemented")
+        generatePoints()
+        val oldStrokeCol = g.stroke
+        val oldFillCol = g.fill
+        if (strokeCol != null) {
+            g.stroke = strokeCol
+        }
+        if (fillCol != null) {
+            g.fill = fillCol
+        }
+        if (fill == true) {
+            out = "filled $out"
+            g.fillPolygon(xp.toDoubleArray(), yp.toDoubleArray(), 100)
+        }
+        g.strokePolygon(xp.toDoubleArray(), yp.toDoubleArray(), 100)
+        if (strokeCol != null) {
+            out = "$out stroke colour: $strokeCol"
+            g.stroke = oldStrokeCol
+        }
+        if (fillCol != null) {
+            out = "$out fill colour: $fillCol"
+            g.fill = oldFillCol
+        }
+        log.out(out)
     }
 }
 
