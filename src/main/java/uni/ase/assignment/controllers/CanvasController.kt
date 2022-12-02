@@ -665,26 +665,7 @@ class CanvasController(val g: GraphicsContext, val log: LogController) {
                     x = params[1].toDouble(),
                     y = params[2].toDouble(),
                     text = params[3],
-                    fill = params[4].toBoolean()
-                ).draw()
-                6 -> Text(
-                    log,
-                    g,
-                    x = params[1].toDouble(),
-                    y = params[2].toDouble(),
-                    text = params[3],
-                    fill = params[4].toBoolean(),
-                    strokeCol = Color.web(getHex(params[5]))
-                ).draw()
-                7 -> Text(
-                    log,
-                    g,
-                    x = params[1].toDouble(),
-                    y = params[2].toDouble(),
-                    text = params[3],
-                    fill = params[4].toBoolean(),
-                    strokeCol = Color.web(getHex(params[5])),
-                    fillCol = Color.web(getHex(params[6])),
+                    strokeCol = Color.web(getHex(params[4]))
                 ).draw()
                 else -> log.error("incorrect number of parameters")
             }
