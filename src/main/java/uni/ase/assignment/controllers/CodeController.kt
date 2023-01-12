@@ -3,6 +3,7 @@ package uni.ase.assignment.controllers
 import javafx.scene.control.TextArea
 import javafx.stage.FileChooser
 import javafx.stage.Stage
+import uni.ase.assignment.parser.CodeParser
 import java.io.File
 import java.nio.file.Files
 

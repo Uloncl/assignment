@@ -17,6 +17,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 import uni.ase.assignment.controllers.*;
+import uni.ase.assignment.parser.CodeParser;
 
 /**
  * the Main Controller class which is used to process actions from the main window such as clicks or movements

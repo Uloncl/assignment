@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.testfx.api.FxToolkit
 import org.testfx.framework.junit5.ApplicationTest
+import uni.ase.assignment.parser.CodeParser
 
 /**
  * tests the [ConsoleController] class, extends the [ApplicationTest] class from testfx from https://github.com/TestFX/TestFX

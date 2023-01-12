@@ -1,20 +1,15 @@
 package uni.ase.assignment.controllers
 
 import javafx.scene.Scene
-import javafx.scene.canvas.Canvas
 import javafx.scene.control.TextArea
-import javafx.scene.control.TextField
-import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Order
 import org.junit.platform.commons.util.StringUtils
 import org.testfx.api.FxToolkit
 import org.testfx.framework.junit5.ApplicationTest
-import kotlin.test.assertSame
 
 /**
  * tests the [LogController] class, extends the [ApplicationTest] class from testfx from https://github.com/TestFX/TestFX
