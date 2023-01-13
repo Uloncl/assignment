@@ -9,9 +9,8 @@ class MapVar (
     val keyType: String?,
     val valType: String?,
     mutable : Boolean,
-    scope: Block,
-    log : LogController
-) : Variable(name, mutable, scope, log) {
+    scope: Block
+) : Variable(name, mutable, scope) {
 
     private var mapStringString  : Map<StringVar, StringVar>  = mapOf<StringVar, StringVar>()
     private var mapStringInteger : Map<StringVar, IntegerVar> = mapOf<StringVar, IntegerVar>()
@@ -271,7 +270,7 @@ class MapVar (
     }
 
     fun parseCollection (collection : String) {
-        log.out("map<$keyType, $valType> detected")
+        scope.parser.log.out("map<$keyType, $valType> detected")
         var collectionArr : Map<Any?, Any?> = mutableMapOf()
         when {
             keyType == "String" -> {
@@ -282,19 +281,17 @@ class MapVar (
                                 name = "$name${k.key}k",
                                 value = k.key.toString(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             var subval = StringVar(
                                 name = "$name${k.key}v",
                                 value = k.value.toString(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             return@map Pair(subkey, subval)
                         }.associate { it.first to it.second }.toMutableMap()
-                        strstrmap.forEach { t, u -> log.out("${t.value}: ${u.value}") }
+                        strstrmap.forEach { t, u -> scope.parser.log.out("${t.value}: ${u.value}") }
                         map = strstrmap
                     }
                     valType == "Int" || valType == "Integer" -> {
@@ -303,19 +300,17 @@ class MapVar (
                                 name = "$name${k.key}k",
                                 value = k.key.toString(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             var subval = IntegerVar(
                                 name = "$name${k.key}v",
                                 value = k.value.toString().toInt(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             return@map Pair(subkey, subval)
                         }.associate { it.first to it.second }.toMutableMap()
-                        strintmap.forEach { t, u -> log.out("${t.value}: ${u.value}") }
+                        strintmap.forEach { t, u -> scope.parser.log.out("${t.value}: ${u.value}") }
                         map = strintmap
                     }
                     valType == "Double" -> {
@@ -324,19 +319,17 @@ class MapVar (
                                 name = "$name${k.key}k",
                                 value = k.key.toString(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             var subval = DoubleVar(
                                 name = "$name${k.key}v",
                                 value = k.value.toString().toDouble(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             return@map Pair(subkey, subval)
                         }.associate { it.first to it.second }.toMutableMap()
-                        strdoumap.forEach { t, u -> log.out("${t.value}: ${u.value}") }
+                        strdoumap.forEach { t, u -> scope.parser.log.out("${t.value}: ${u.value}") }
                         map = strdoumap
                     }
                     valType == "Boolean" -> {
@@ -345,19 +338,17 @@ class MapVar (
                                 name = "$name${k.key}k",
                                 value = k.key.toString(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             var subval = BooleanVar(
                                 name = "$name${k.key}v",
                                 value = k.value.toString().toBoolean(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             return@map Pair(subkey, subval)
                         }.associate { it.first to it.second }.toMutableMap()
-                        strboomap.forEach { t, u -> log.out("${t.value}: ${u.value}") }
+                        strboomap.forEach { t, u -> scope.parser.log.out("${t.value}: ${u.value}") }
                         map = strboomap
                     }
                 }
@@ -370,19 +361,17 @@ class MapVar (
                                 name = "$name${k.key}k",
                                 value = k.key.toInt(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             var subval = StringVar(
                                 name = "$name${k.key}v",
                                 value = k.value.toString(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             return@map Pair(subkey, subval)
                         }.associate { it.first to it.second }.toMutableMap()
-                        intstrmap.forEach { t, u -> log.out("${t.value}: ${u.value}") }
+                        intstrmap.forEach { t, u -> scope.parser.log.out("${t.value}: ${u.value}") }
                         map = intstrmap
                     }
                     valType == "Int" || valType == "Integer" -> {
@@ -391,19 +380,17 @@ class MapVar (
                                 name = "$name${k.key}k",
                                 value = k.key.toInt(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             var subval = IntegerVar(
                                 name = "$name${k.key}v",
                                 value = k.value.toString().toInt(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             return@map Pair(subkey, subval)
                         }.associate { it.first to it.second }.toMutableMap()
-                        intintmap.forEach { t, u -> log.out("${t.value}: ${u.value}") }
+                        intintmap.forEach { t, u -> scope.parser.log.out("${t.value}: ${u.value}") }
                         map = intintmap
                     }
                     valType == "Double" -> {
@@ -412,19 +399,17 @@ class MapVar (
                                 name = "$name${k.key}k",
                                 value = k.key.toInt(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             var subval = DoubleVar(
                                 name = "$name${k.key}v",
                                 value = k.value.toString().toDouble(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             return@map Pair(subkey, subval)
                         }.associate { it.first to it.second }.toMutableMap()
-                        intdoumap.forEach { t, u -> log.out("${t.value}: ${u.value}") }
+                        intdoumap.forEach { t, u -> scope.parser.log.out("${t.value}: ${u.value}") }
                         map = intdoumap
                     }
                     valType == "Boolean" -> {
@@ -433,19 +418,17 @@ class MapVar (
                                 name = "$name${k.key}k",
                                 value = k.key.toInt(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             var subval = BooleanVar(
                                 name = "$name${k.key}v",
                                 value = k.value.toString().toBoolean(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             return@map Pair(subkey, subval)
                         }.associate { it.first to it.second }.toMutableMap()
-                        intboomap.forEach { t, u -> log.out("${t.value}: ${u.value}") }
+                        intboomap.forEach { t, u -> scope.parser.log.out("${t.value}: ${u.value}") }
                         map = intboomap
                     }
                 }
@@ -458,19 +441,17 @@ class MapVar (
                                 name = "$name${k.key}k",
                                 value = k.key.toDouble(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             var subval = StringVar(
                                 name = "$name${k.key}v",
                                 value = k.value.toString(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             return@map Pair(subkey, subval)
                         }.associate { it.first to it.second }.toMutableMap()
-                        doustrmap.forEach { t, u -> log.out("${t.value}: ${u.value}") }
+                        doustrmap.forEach { t, u -> scope.parser.log.out("${t.value}: ${u.value}") }
                         map = doustrmap
                     }
                     valType == "Int" || valType == "Integer" -> {
@@ -479,19 +460,17 @@ class MapVar (
                                 name = "$name${k.key}k",
                                 value = k.key.toDouble(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             var subval = IntegerVar(
                                 name = "$name${k.key}v",
                                 value = k.value.toString().toInt(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             return@map Pair(subkey, subval)
                         }.associate { it.first to it.second }.toMutableMap()
-                        douintmap.forEach { t, u -> log.out("${t.value}: ${u.value}") }
+                        douintmap.forEach { t, u -> scope.parser.log.out("${t.value}: ${u.value}") }
                         map = douintmap
                     }
                     valType == "Double" -> {
@@ -500,19 +479,17 @@ class MapVar (
                                 name = "$name${k.key}k",
                                 value = k.key.toDouble(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             var subval = DoubleVar(
                                 name = "$name${k.key}v",
                                 value = k.value.toString().toDouble(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             return@map Pair(subkey, subval)
                         }.associate { it.first to it.second }.toMutableMap()
-                        doudoumap.forEach { t, u -> log.out("${t.value}: ${u.value}") }
+                        doudoumap.forEach { t, u -> scope.parser.log.out("${t.value}: ${u.value}") }
                         map = doudoumap
                     }
                     valType == "Boolean" -> {
@@ -521,19 +498,17 @@ class MapVar (
                                 name = "$name${k.key}k",
                                 value = k.key.toDouble(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             var subval = BooleanVar(
                                 name = "$name${k.key}v",
                                 value = k.value.toString().toBoolean(),
                                 mutable = mutable,
-                                scope = scope,
-                                log = log
+                                scope = scope
                             )
                             return@map Pair(subkey, subval)
                         }.associate { it.first to it.second }.toMutableMap()
-                        douboomap.forEach { t, u -> log.out("${t.value}: ${u.value}") }
+                        douboomap.forEach { t, u -> scope.parser.log.out("${t.value}: ${u.value}") }
                         map = douboomap
                     }
                 }

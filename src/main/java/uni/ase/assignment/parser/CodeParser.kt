@@ -2,6 +2,7 @@ package uni.ase.assignment.parser
 
 import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
+import javafx.scene.paint.Color
 import uni.ase.assignment.controllers.CanvasController
 import uni.ase.assignment.controllers.ConsoleController
 import uni.ase.assignment.controllers.LogController
@@ -41,10 +42,9 @@ class CodeParser (
             mutableListOf(),
             mutableListOf(),
             mutableListOf(),
-            log         = log
+            parser = this@CodeParser
         ),
-        parser      = this,
-        log         = log
+        parser = this@CodeParser
     )
 
     //                              name    mutable   value
@@ -64,16 +64,16 @@ class CodeParser (
     val variableDeclarationRegex : Regex = Regex("(?<mutable>var|val)\\s*(?<name>[a-z]\\w*)\\s*:\\s*((?<collectiontype>[A-Z]\\w+<[\\w, \\<\\>]+>)|(?<type>[A-Z]\\w+))\\s*\\=\\s*(?<value>(?<string>\\\".+\\\"|'.+')|(?<double>\\d+\\.\\d+)|(?<integer>\\d+)|(?<function>(?<funcname>\\w+)\\((?<funcparams>.*)\\))|(?<null>null)|(?<boolean>true|false)|(?<collection>\\[.+\\]))")
     val variableUpdateRegex : Regex = Regex("(?<name>\\w+)\\s*(?<method>\\=|\\+\\=|\\-\\=)\\s*(?<value>(?<string>\\\".+\\\"|'.+')|(?<double>\\d+\\.\\d+)|(?<integer>\\d+)|(?<function>(?<funcname>\\w+)\\((?<funcparams>.*)\\))|(?<null>null)|(?<boolean>true|false)|(?<collection>\\[.++\\]))")
 
-    val functionCallRegex : Regex = Regex("(?<name>\\w+)\\((?<params>.*)\\)")
+    val functionCallRegex : Regex = Regex("(?<name>[A-Z]\\w+)\\((?<params>.*)\\)")
 
-    val functionDeclarationRegex : Regex = Regex("function\\s+(?<name>\\w*)\\((?<params>.*)\\)(\\s*:\\s*(?<returntype>[A-Z]\\w*))?")
+    val functionDeclarationRegex : Regex = Regex("function\\s+(?<name>\\w*)\\((?<params>.*)\\)(\\s*:\\s*(?<returntype>[A-Z]\\w*))?\\s*")
 
-    val ifRegex : Regex = Regex("if\\s+\\((?<condition>.*)\\)")
-    val elifRegex : Regex = Regex("elif\\s+\\((?<condition>.*)\\)")
-    val elseRegex : Regex = Regex("else")
+    val ifRegex : Regex = Regex("if\\s+\\((?<condition>.*)\\)\\s*")
+    val elifRegex : Regex = Regex("elif\\s+\\((?<condition>.*)\\)\\s*")
+    val elseRegex : Regex = Regex("\\s*else\\s*")
 
-    val forRegex : Regex = Regex("for\\s+(?<params>\\(\\s*(?<param1>.*)\\s*;\\s*(?<param2>.*)\\s*;\\s*(?<param3>.*)\\s*\\)|\\(\\s*(?<parama>.*)\\s*in\\s*(?<paramb>.*)\\s*\\))")
-    val whileRegex : Regex = Regex("while\\s+\\((?<condition>.*)\\)")
+    val forRegex : Regex = Regex("for\\s+(?<params>\\(\\s*(?<param1>.*)\\s*;\\s*(?<param2>.*)\\s*;\\s*(?<param3>.*)\\s*\\)|\\(\\s*(?<parama>.*)\\s*in\\s*(?<paramb>.*)\\s*\\))\\s*")
+    val whileRegex : Regex = Regex("while\\s+\\((?<condition>.*)\\)\\s*")
 
     val allBetweenBraces : Regex = Regex("(\\{\\s*([^{}]+[^\\s])\\s*\\})")
 
@@ -122,14 +122,11 @@ class CodeParser (
                         mutableListOf(),
                         mutableListOf(),
                         mutableListOf(),
-                        log         = log
+                        parser = this@CodeParser
                     ),
-                    parser      = this@CodeParser,
-                    log         = log
-                ),
-                log         = log
+                    parser = this@CodeParser
+                )
             ))
-            log.out("line: ${initialLines.last().num} range: ${initialLines.last().range} line: ${initialLines.last().line}")
             cumulativeChars+=lineLen+1
         }
 
@@ -149,10 +146,9 @@ class CodeParser (
                 mutableListOf(),
                 mutableListOf(),
                 mutableListOf(),
-                log         = log
+                parser = this@CodeParser
             ),
-            parser      = this@CodeParser,
-            log         = log
+            parser = this@CodeParser
         )
 
 //        allCode.lines.forEach { line ->
@@ -187,17 +183,15 @@ class CodeParser (
                         mutableListOf(),
                         mutableListOf(),
                         mutableListOf(),
-                        log         = log
+                        parser = this@CodeParser
                     ),
-                    parser      = this@CodeParser,
-                    log         = log
+                    parser = this@CodeParser
                 )
             )
         }
 
         var parentsPossible = true;
         while (parentsPossible) {
-            log.out("\n\n\n\n\n\nlooking for parents")
             /** find a block of code that contains any combination of any known block of code */
             val tryFindParentRegex : String = blocks.filter { it.parent == null }.mapIndexed { i, block ->
                     "[^{}]*(?<block${i+1}>${
@@ -211,13 +205,10 @@ class CodeParser (
                             .replace("]", "\\]")
                     })[^{}]*"
                 }.joinToString("|", "(?<block0>\\{((|, )(", "))+\\})")
-            log.out("regex to find parents: $tryFindParentRegex")
             var regexResult = Regex(tryFindParentRegex).find(allCode.code)?.groups as? MatchNamedGroupCollection
-            log.out(regexResult)
 
             /** if a block as been found take the parent which will be block0 and find where it is in the main block of code */
             if (regexResult != null) {
-                log.out("oh hey its not null")
 
                 if (blocks.map { block -> block.code }.contains(regexResult?.get("block0")?.value)) {
                     val dupedBlock = blocks.filter { it.code == regexResult?.get("block0")?.value }.first()
@@ -253,12 +244,10 @@ class CodeParser (
                             mutableListOf(),
                             mutableListOf(),
                             mutableListOf(),
-                            log         = log
+                            parser = this@CodeParser
                         ),
-                        parser = this@CodeParser,
-                        log         = log
+                        parser = this@CodeParser
                     )
-                    log.out("the parent is: ${parent.code}")
                     /** now that the parent has been found, find all the blocks that were found within that parent, add them to the parent and add the parent to them */
                     matchingBlocks.addAll(blocks.filter { block ->
                         regexResult.map { result -> result?.value }.intersect(blocks.map { b -> b.code })
@@ -266,12 +255,10 @@ class CodeParser (
                     })
                     matchingBlocks.forEach { block -> block.parent = parent }
                     parent.children = matchingBlocks
-                    parent.children.forEachIndexed { i, b -> log.out("top level child $i: ${b.code}") }
                     blocks.add(parent)
                 }
             } else {
                 blocks.filter { block -> block.parent == null }.forEach { orphan ->
-                    log.out("\norphan: ${orphan.code}\n\n")
                     val orphanSearchRegex = Regex("(?<allcode>[\\s\\S]*(?<orphanblock>${
                         orphan.code
                             .replace("\n", "\\n")
@@ -283,7 +270,6 @@ class CodeParser (
                             .replace("]", "\\]")
                     })[\\s\\S]*)")
                     var orphanRes = orphanSearchRegex.find(allCode.code)?.groups as? MatchNamedGroupCollection
-                    log.out("$orphanSearchRegex\n\n$orphanRes\n\n")
                     if (orphanRes != null && orphanRes.get("allcode")?.value == allCode.code && orphanRes.get("orphanblock") != null) {
                         orphan.parent = allCode
                         orphan.range = orphanRes.get("orphanblock")!!.range
@@ -300,7 +286,6 @@ class CodeParser (
         allCode.defineBlocks()
         allCode.parseLines()
 
-        log.out("\n\n\n\n\n\nprint all child blocks\n\n\n\n\n\n\n\n\n")
         allCode.printChildren()
 
 //        blocks.forEachIndexed { index, block -> log.out("$index: ${block.type} ${block.name} (${block.parameters}) = ${block.code} in range: ${block.range} lines: ${block.lineRange} ${block.lines.joinToString("\n")} contains ${block.children.size} sub blocks has ${block.parent} as a parent and ${block.vars} are the variables in this scope") }

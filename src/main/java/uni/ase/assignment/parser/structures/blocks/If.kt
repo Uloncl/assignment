@@ -4,9 +4,8 @@ import uni.ase.assignment.controllers.LogController
 import uni.ase.assignment.parser.structures.Condition
 
 class If (
-    val block : Block,
+    block : Block,
     var condition: Condition?,
-    var ifGroup : IfGroup?,
-    val log : LogController
-) {
+    var ifGroup : IfGroup
+) : Structure (block) {
 }

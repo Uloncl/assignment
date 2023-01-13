@@ -10,7 +10,6 @@ class Line (
     val type : LineType? = LineType.FUNCTION_CALL,
     var variable : Any?,
     var operation : Unit?,
-    val blockState : Block?,
-    val log : LogController
+    val blockState : Block?
 ) {
 }

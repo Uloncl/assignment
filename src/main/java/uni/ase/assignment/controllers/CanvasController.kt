@@ -333,7 +333,7 @@ class CanvasController(val g: GraphicsContext, val log: LogController) {
     }
 
     /**
-     * draws a line from the coordinates [x1], [y2] to [x2], [y2]
+     * draws a line from the coordinates [x1], [y1] to [x2], [y2]
      */
     fun DrawLine(params: List<String>) {
         try {
@@ -341,23 +341,22 @@ class CanvasController(val g: GraphicsContext, val log: LogController) {
                 1 -> log.error("not enough parameters")
                 2 -> log.error("not enough parameters")
                 3 -> log.error("not enough parameters")
-                4 -> log.error("not enough parameters")
+                4 -> Line(
+                    log,
+                    g,
+                    x1 = params[0].toDouble(),
+                    y1 = params[1].toDouble(),
+                    x2 = params[2].toDouble(),
+                    y2 = params[3].toDouble()
+                ).draw()
                 5 -> Line(
                     log,
                     g,
-                    x1 = params[1].toDouble(),
-                    y1 = params[2].toDouble(),
-                    x2 = params[3].toDouble(),
-                    y2 = params[4].toDouble()
-                ).draw()
-                6 -> Line(
-                    log,
-                    g,
-                    x1 = params[1].toDouble(),
-                    y1 = params[2].toDouble(),
-                    x2 = params[3].toDouble(),
-                    y2 = params[4].toDouble(),
-                    strokeCol = Color.web(getHex(params[5]))
+                    x1 = params[0].toDouble(),
+                    y1 = params[1].toDouble(),
+                    x2 = params[2].toDouble(),
+                    y2 = params[3].toDouble(),
+                    strokeCol = Color.web(params[4])
                 ).draw()
                 else -> log.error("incorrect number of parameters")
             }

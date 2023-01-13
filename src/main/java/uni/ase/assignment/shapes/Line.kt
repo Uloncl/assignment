@@ -15,6 +15,7 @@ class Line(
 ) : Shape(log, g, x1, y1) {
     override var out : String = "Line drawn from $x1, $y1 to $x2, $y2"
     override fun draw() {
+        println("in Line")
         val oldStrokeCol = g.stroke
         if (strokeCol != null) {
             g.stroke = strokeCol

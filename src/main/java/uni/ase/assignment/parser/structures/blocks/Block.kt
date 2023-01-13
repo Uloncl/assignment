@@ -1,11 +1,14 @@
 package uni.ase.assignment.parser.structures.blocks
 
-import uni.ase.assignment.controllers.LogController
+import javafx.scene.paint.Color
+import javafx.scene.shape.ArcType
 import uni.ase.assignment.parser.CodeParser
 import uni.ase.assignment.parser.structures.Condition
 import uni.ase.assignment.parser.structures.Line
 import uni.ase.assignment.parser.structures.LineType
+import uni.ase.assignment.parser.structures.Parameter
 import uni.ase.assignment.parser.structures.variables.*
+import uni.ase.assignment.shapes.*
 
 class Block (
     var type : BlockType?,
@@ -17,8 +20,7 @@ class Block (
     var children : MutableList<Block>,
     var parent : Block?,
     var vars : Variables,
-    var parser : CodeParser,
-    val log : LogController
+    var parser : CodeParser
 ) {
     override fun toString() : String {
         return code
@@ -32,10 +34,10 @@ class Block (
     }
 
     fun printChildren(index : Int = 0) {
-        log.out("child $index - lines $lineRange: $code\n\n\n")
+        parser.log.out("child $index - lines $lineRange: $code\n")
         children.forEachIndexed { i, c ->
             c.printChildren(i)
-            log.out("\n\n")
+            parser.log.out("\n")
         }
     }
 
@@ -58,47 +60,200 @@ class Block (
         }
     }
 
-    fun parseLines() {
-        log.out("parsing lines")
+    fun isInFunction() : Function? {
+        if (parent?.type == BlockType.FUNCTION) {
+            return parent?.structure as? uni.ase.assignment.parser.structures.blocks.Function
+        } else if (parent?.type == BlockType.MAIN) {
+            return null
+        } else {
+            parent?.isInFunction()
+        }
+        return null
+    }
+
+    fun parseLines() : String? {
+        parser.log.out("parsing lines")
         var cumulativeChars = 0
         var newLines = mutableListOf<Line>()
         code.replace("\t", "")
             .split("\n").toMutableList()
             .forEachIndexed { i, l ->
-                log.out("$i: $l")
+                parser.log.out("\n$i: $l")
                 val lineLen = l.length
                 var type = LineType.UNKNOWN
                 var variable : Any? = null
                 when {
+                    l.matches(Regex("return\\s+(?<toreturn>[^\\n]+)")) -> {
+                        if (isInFunction() != null) {
+                            var func = isInFunction()
+                            if (func?.returnType != null) {
+                                type = LineType.RETURN
+                                val returnStatement = Regex("return\\s+(?<toreturn>[^\\n]+)").find(l)!!.groups as? MatchNamedGroupCollection
+                                return returnStatement?.get("toreturn")?.value
+                            } else {
+                                parser.log.error("function does not have a return type")
+                            }
+                        } else {
+                            parser.log.error("return statement is not within a function")
+                        }
+                    }
                     l.matches(parser.functionCallRegex) -> {
-                        log.out("function call detected")
+                        parser.log.out("function call detected")
                         type = LineType.FUNCTION_CALL
                         var newLine = Line(
                             num = i,
                             range = cumulativeChars until cumulativeChars + lineLen,
                             line = l,
                             type = type,
-                            variable = variable,
+                            variable = null,
                             operation = null,
-                            blockState = this@Block,
-                            log         = log
+                            blockState = this@Block
                         )
                         newLines.add(newLine)
+                        val functioncall = parser.functionCallRegex.find(l)!!.groups as? MatchNamedGroupCollection
+                        val funcname = functioncall?.get("name")?.value ?: ""
+                        val funcparams = functioncall?.get("params")?.value?.split(",")?.toMutableList() ?: mutableListOf()
+                        when {
+                            funcname == "Line" -> {
+                                Line(parser.log, parser.cac.g,
+                                    (findInScope(funcparams.get(0))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(0).toDouble(),
+                                    (findInScope(funcparams.get(1))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(1).toDouble(),
+                                    (findInScope(funcparams.get(2))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(2).toDouble(),
+                                    (findInScope(funcparams.get(3))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(3).toDouble(),
+                                    Color.web((findInScope(funcparams.get(0))?.firstOrNull() as StringVar?)?.value ?: funcparams.get(0))
+                                ).draw()
+                            }
+                            funcname == "Square" -> {
+                                Square(parser.log, parser.cac.g,
+                                    (findInScope(funcparams.get(0))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(0).toDouble(),
+                                    (findInScope(funcparams.get(1))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(1).toDouble(),
+                                    (findInScope(funcparams.get(2))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(2).toDouble(),
+                                    (findInScope(funcparams.get(3))?.firstOrNull() as BooleanVar?)?.value ?: funcparams.get(3).toBoolean(),
+                                    (findInScope(funcparams.get(4))?.firstOrNull() as BooleanVar?)?.value ?: funcparams.get(4).toBoolean(),
+                                    (findInScope(funcparams.get(5))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(5).toDouble(),
+                                    Color.web((findInScope(funcparams.get(6))?.firstOrNull() as StringVar?)?.value ?: funcparams.get(6)),
+                                    Color.web((findInScope(funcparams.get(7))?.firstOrNull() as StringVar?)?.value ?: funcparams.get(7))
+                                ).draw()
+                            }
+                            funcname == "Circle" -> {
+                                Circle(parser.log, parser.cac.g,
+                                    (findInScope(funcparams.get(0))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(0).toDouble(),
+                                    (findInScope(funcparams.get(1))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(1).toDouble(),
+                                    (findInScope(funcparams.get(2))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(2).toDouble(),
+                                    (findInScope(funcparams.get(3))?.firstOrNull() as BooleanVar?)?.value ?: funcparams.get(3).toBoolean(),
+                                    Color.web((findInScope(funcparams.get(4))?.firstOrNull() as StringVar?)?.value ?: funcparams.get(4)),
+                                    Color.web((findInScope(funcparams.get(5))?.firstOrNull() as StringVar?)?.value ?: funcparams.get(5))
+                                ).draw()
+                            }
+                            funcname == "Rectangle" -> {
+                                Rectangle(parser.log, parser.cac.g,
+                                    (findInScope(funcparams.get(0))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(0).toDouble(),
+                                    (findInScope(funcparams.get(1))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(1).toDouble(),
+                                    (findInScope(funcparams.get(2))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(2).toDouble(),
+                                    (findInScope(funcparams.get(3))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(3).toDouble(),
+                                    (findInScope(funcparams.get(4))?.firstOrNull() as BooleanVar?)?.value ?: funcparams.get(4).toBoolean(),
+                                    (findInScope(funcparams.get(5))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(5).toDouble(),
+                                    (findInScope(funcparams.get(6))?.firstOrNull() as BooleanVar?)?.value ?: funcparams.get(6).toBoolean(),
+                                    Color.web((findInScope(funcparams.get(7))?.firstOrNull() as StringVar?)?.value ?: funcparams.get(7)),
+                                    Color.web((findInScope(funcparams.get(8))?.firstOrNull() as StringVar?)?.value ?: funcparams.get(8))
+                                ).draw()
+                            }
+                            funcname == "Oval" -> {
+                                Oval(parser.log, parser.cac.g,
+                                    (findInScope(funcparams.get(0))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(0).toDouble(),
+                                    (findInScope(funcparams.get(1))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(1).toDouble(),
+                                    (findInScope(funcparams.get(2))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(2).toDouble(),
+                                    (findInScope(funcparams.get(3))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(3).toDouble(),
+                                    (findInScope(funcparams.get(4))?.firstOrNull() as BooleanVar?)?.value ?: funcparams.get(4).toBoolean(),
+                                    Color.web((findInScope(funcparams.get(5))?.firstOrNull() as StringVar?)?.value ?: funcparams.get(5)),
+                                    Color.web((findInScope(funcparams.get(6))?.firstOrNull() as StringVar?)?.value ?: funcparams.get(6))
+                                ).draw()
+                            }
+                            funcname == "Polygon" -> {
+                                var polypreset = PolygonPreset.NONE
+                                Polygon(parser.log, parser.cac.g,
+                                    (findInScope(funcparams.get(0))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(0).toDouble(),
+                                    (findInScope(funcparams.get(1))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(1).toDouble(),
+                                    (findInScope(funcparams.get(2))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(2).toDouble(),
+                                    (findInScope(funcparams.get(3))?.firstOrNull() as IntegerVar?)?.value?.toInt() ?: funcparams.get(3).toInt(),
+                                    polypreset,
+                                    (findInScope(funcparams.get(4))?.firstOrNull() as BooleanVar?)?.value ?: funcparams.get(4).toBoolean(),
+                                    Color.web((findInScope(funcparams.get(5))?.firstOrNull() as StringVar?)?.value ?: funcparams.get(5)),
+                                    Color.web((findInScope(funcparams.get(6))?.firstOrNull() as StringVar?)?.value ?: funcparams.get(6))
+                                ).draw()
+                            }
+                            funcname == "Polyline" -> {
+                                var polypreset = PolylinePreset.NONE
+                                Polyline(parser.log, parser.cac.g,
+                                    (findInScope(funcparams.get(0))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(0).toDouble(),
+                                    (findInScope(funcparams.get(1))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(1).toDouble(),
+                                    (findInScope(funcparams.get(2))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(2).toDouble(),
+                                    (findInScope(funcparams.get(3))?.firstOrNull() as IntegerVar?)?.value?.toInt() ?: funcparams.get(3).toInt(),
+                                    polypreset,
+                                    Color.web((findInScope(funcparams.get(4))?.firstOrNull() as StringVar?)?.value ?: funcparams.get(4))
+                                ).draw()
+                            }
+                            funcname == "Arc" -> {
+                                Arc(parser.log, parser.cac.g,
+                                    (findInScope(funcparams.get(0))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(0).toDouble(),
+                                    (findInScope(funcparams.get(1))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(1).toDouble(),
+                                    (findInScope(funcparams.get(2))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(2).toDouble(),
+                                    (findInScope(funcparams.get(3))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(3).toDouble(),
+                                    (findInScope(funcparams.get(4))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(4).toDouble(),
+                                    (findInScope(funcparams.get(5))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(5).toDouble(),
+                                    ArcType.OPEN,
+                                    Color.web((findInScope(funcparams.get(6))?.firstOrNull() as StringVar?)?.value ?: funcparams.get(6))
+                                ).draw()
+                            }
+                            funcname == "Text" -> {
+                                Text(parser.log, parser.cac.g,
+                                    (findInScope(funcparams.get(0))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(0).toDouble(),
+                                    (findInScope(funcparams.get(1))?.firstOrNull() as IntegerVar?)?.value?.toDouble() ?: funcparams.get(1).toDouble(),
+                                    (findInScope(funcparams.get(2))?.firstOrNull() as StringVar?)?.value ?: funcparams.get(2),
+                                    (findInScope(funcparams.get(4))?.firstOrNull() as BooleanVar?)?.value ?: funcparams.get(4).toBoolean(),
+                                    Color.web((findInScope(funcparams.get(5))?.firstOrNull() as StringVar?)?.value ?: funcparams.get(5)),
+                                    Color.web((findInScope(funcparams.get(6))?.firstOrNull() as StringVar?)?.value ?: funcparams.get(6))
+                                ).draw()
+                            }
+//                            "Triangle" -> {
+//
+//                            }
+                            funcname == "Clear" -> {
+                                parser.cac.clear()
+                            }
+                            funcname == "Reset" -> {
+                                parser.cac.reset()
+                            }
+                            funcname == "Wait" -> {
+                                Thread.sleep((findInScope(funcparams.get(0))?.firstOrNull() as IntegerVar?)?.value?.toLong() ?: funcparams.get(0).toLong())
+                            }
+                            funcname == "Print" -> {
+                                parser.log.out((findInScope(funcparams.get(0))?.firstOrNull() as StringVar?)?.value ?: funcparams.get(0))
+                            }
+                            parser.allCode.children.filter { it.type == BlockType.FUNCTION }.isNotEmpty() -> {
+                                parser.log.out("user defined function call detected")
+                                (parser.allCode.children.filter { it.structure is Function && (it as uni.ase.assignment.parser.structures.blocks.Function).name == funcname }.first().structure as Function).run(funcparams.joinToString(","))
+                            }
+                            else -> {
+                                parser.log.error("no function definition found")
+                            }
+                        }
                     }
                     l.matches(parser.variableDeclarationRegex) -> {
-                        log.out("variable declaration detected")
+                        parser.log.out("variable declaration detected")
                         type = LineType.VARIABLE_DECLARATION
                         val variableDeclaration = parser.variableDeclarationRegex.find(l)!!.groups as? MatchNamedGroupCollection
                         val datatype : String = variableDeclaration?.get("type")?.value ?: ""
                         val collectiontype : String = variableDeclaration?.get("collectiontype")?.value ?: ""
                         when {
                             datatype == "String" -> {
+                                val param = Parameter(variableDeclaration?.get("string")!!.value, null, this@Block, parser)
+                                param.evaluate()
                                 variable = StringVar(
                                     name = variableDeclaration?.get("name")!!.value,
-                                    value = variableDeclaration?.get("string")!!.value,
+                                    value = (param.result as StringVar?)?.value ?: "",
                                     mutable = variableDeclaration?.get("mutable")!!.value == "var",
-                                    scope = this@Block,
-                            log         = log
+                                    scope = this@Block
                                 )
                                 vars.strings.add(variable)
                                 var newLine = Line(
@@ -108,18 +263,18 @@ class Block (
                                     type = type,
                                     variable = variable,
                                     operation = null,
-                                    blockState = this@Block,
-                            log         = log
+                                    blockState = this@Block
                                 )
                                 newLines.add(newLine)
                             }
                             datatype == "Int" || datatype == "Integer"  -> {
+                                val param = Parameter(variableDeclaration?.get("integer")!!.value, null, this@Block, parser)
+                                param.evaluate()
                                 variable = IntegerVar(
                                     name = variableDeclaration?.get("name")!!.value,
-                                    value = variableDeclaration?.get("integer")!!.value.toInt(),
+                                    value = (param.result as IntegerVar?)?.value!!,
                                     mutable = variableDeclaration?.get("mutable")!!.value == "var",
-                                    scope = this@Block,
-                            log         = log
+                                    scope = this@Block
                                 )
                                 vars.integers.add(variable)
                                 var newLine = Line(
@@ -129,18 +284,18 @@ class Block (
                                     type = type,
                                     variable = variable,
                                     operation = null,
-                                    blockState = this@Block,
-                                    log         = log
+                                    blockState = this@Block
                                 )
                                 newLines.add(newLine)
                             }
                             datatype == "Double" -> {
+                                val param = Parameter(variableDeclaration?.get("double")!!.value, null, this@Block, parser)
+                                param.evaluate()
                                 variable = DoubleVar(
                                     name = variableDeclaration?.get("name")!!.value,
-                                    value = variableDeclaration?.get("double")!!.value.toDouble(),
+                                    value = (param.result as DoubleVar?)?.value!!,
                                     mutable = variableDeclaration?.get("mutable")!!.value == "var",
-                                    scope = this@Block,
-                            log         = log
+                                    scope = this@Block
                                 )
                                 vars.doubles.add(variable)
                                 var newLine = Line(
@@ -150,18 +305,18 @@ class Block (
                                     type = type,
                                     variable = variable,
                                     operation = null,
-                                    blockState = this@Block,
-                                    log         = log
+                                    blockState = this@Block
                                 )
                                 newLines.add(newLine)
                             }
                             datatype == "Boolean" -> {
+                                val param = Parameter(variableDeclaration?.get("boolean")!!.value, null, this@Block, parser)
+                                param.evaluate()
                                 variable = BooleanVar(
                                     name = variableDeclaration?.get("name")!!.value,
-                                    value = variableDeclaration?.get("boolean")!!.value.toBoolean(),
+                                    value = (param.result as BooleanVar?)?.value!!,
                                     mutable = variableDeclaration?.get("mutable")!!.value == "var",
-                                    scope = this@Block,
-                            log         = log
+                                    scope = this@Block
                                 )
                                 vars.booleans.add(variable)
                                 var newLine = Line(
@@ -171,8 +326,7 @@ class Block (
                                     type = type,
                                     variable = variable,
                                     operation = null,
-                                    blockState = this@Block,
-                                    log         = log
+                                    blockState = this@Block
                                 )
                                 newLines.add(newLine)
                             }
@@ -181,8 +335,7 @@ class Block (
                                     name = variableDeclaration?.get("name")!!.value,
                                     type = collectiontype.substring(6 until collectiontype.length),
                                     mutable = variableDeclaration?.get("mutable")!!.value == "var",
-                                    scope = this@Block,
-                            log         = log
+                                    scope = this@Block
                                 )
                                 variable.parseCollection(variableDeclaration?.get("collection")!!.value)
                                 vars.arrays.add(variable)
@@ -193,8 +346,7 @@ class Block (
                                     type = type,
                                     variable = variable,
                                     operation = null,
-                                    blockState = this@Block,
-                                    log         = log
+                                    blockState = this@Block
                                 )
                                 newLines.add(newLine)
                             }
@@ -205,8 +357,7 @@ class Block (
                                     keyType = maptypes?.get(1)?.value,
                                     valType = maptypes?.get(2)?.value,
                                     mutable = variableDeclaration?.get("mutable")!!.value == "var",
-                                    scope = this@Block,
-                            log         = log
+                                    scope = this@Block
                                 )
                                 variable.parseCollection(variableDeclaration?.get("collection")!!.value)
                                 vars.maps.add(variable)
@@ -217,8 +368,7 @@ class Block (
                                     type = type,
                                     variable = variable,
                                     operation = null,
-                                    blockState = this@Block,
-                                    log         = log
+                                    blockState = this@Block
                                 )
                                 newLines.add(newLine)
                             }
@@ -228,13 +378,15 @@ class Block (
                         }
                     }
                     l.matches(parser.variableUpdateRegex) -> {
-                        log.out("variable update detected")
+                        parser.log.out("variable update detected")
                         type = LineType.VARIABLE_UPDATE
                         val variableUpdate = parser.variableUpdateRegex.find(l)!!.groups as? MatchNamedGroupCollection
                         val varToUpdate : Variable? = findInScope(variableUpdate?.get("name")?.value ?: "")?.first()
                         when {
                             varToUpdate is StringVar -> {
-                                varToUpdate.scope.vars.strings.get(varToUpdate.scope.vars.strings.indexOf(varToUpdate)).value = variableUpdate?.get("string")?.value ?: varToUpdate.scope.vars.strings.get(varToUpdate.scope.vars.strings.indexOf(varToUpdate)).value
+                                val param = Parameter(variableUpdate?.get("string")!!.value, null, this@Block, parser)
+                                param.evaluate()
+                                varToUpdate.scope.vars.strings.get(varToUpdate.scope.vars.strings.indexOf(varToUpdate)).value = (param.result as StringVar?)?.value ?: varToUpdate.scope.vars.strings.get(varToUpdate.scope.vars.strings.indexOf(varToUpdate)).value
                                 var newLine = Line(
                                     num = i,
                                     range = cumulativeChars until cumulativeChars + lineLen,
@@ -242,13 +394,14 @@ class Block (
                                     type = type,
                                     variable = varToUpdate.scope.vars.strings.get(varToUpdate.scope.vars.strings.indexOf(varToUpdate)),
                                     operation = null,
-                                    blockState = this@Block,
-                            log         = log
+                                    blockState = this@Block
                                 )
                                 newLines.add(newLine)
                             }
                             varToUpdate is IntegerVar -> {
-                                varToUpdate.scope.vars.integers.get(varToUpdate.scope.vars.integers.indexOf(varToUpdate)).value = variableUpdate?.get("integer")?.value?.toInt() ?: varToUpdate.scope.vars.integers.get(varToUpdate.scope.vars.integers.indexOf(varToUpdate)).value
+                                val param = Parameter(variableUpdate?.get("string")!!.value, null, this@Block, parser)
+                                param.evaluate()
+                                varToUpdate.scope.vars.integers.get(varToUpdate.scope.vars.integers.indexOf(varToUpdate)).value = (param.result as IntegerVar?)?.value ?: varToUpdate.scope.vars.integers.get(varToUpdate.scope.vars.integers.indexOf(varToUpdate)).value
                                 var newLine = Line(
                                     num = i,
                                     range = cumulativeChars until cumulativeChars + lineLen,
@@ -256,13 +409,14 @@ class Block (
                                     type = type,
                                     variable = varToUpdate.scope.vars.integers.get(varToUpdate.scope.vars.integers.indexOf(varToUpdate)),
                                     operation = null,
-                                    blockState = this@Block,
-                            log         = log
+                                    blockState = this@Block
                                 )
                                 newLines.add(newLine)
                             }
                             varToUpdate is DoubleVar -> {
-                                varToUpdate.scope.vars.doubles.get(varToUpdate.scope.vars.doubles.indexOf(varToUpdate)).value = variableUpdate?.get("double")?.value?.toDouble() ?: varToUpdate.scope.vars.doubles.get(varToUpdate.scope.vars.doubles.indexOf(varToUpdate)).value
+                                val param = Parameter(variableUpdate?.get("string")!!.value, null, this@Block, parser)
+                                param.evaluate()
+                                varToUpdate.scope.vars.doubles.get(varToUpdate.scope.vars.doubles.indexOf(varToUpdate)).value = (param.result as DoubleVar?)?.value ?: varToUpdate.scope.vars.doubles.get(varToUpdate.scope.vars.doubles.indexOf(varToUpdate)).value
                                 var newLine = Line(
                                     num = i,
                                     range = cumulativeChars until cumulativeChars + lineLen,
@@ -270,13 +424,14 @@ class Block (
                                     type = type,
                                     variable = varToUpdate.scope.vars.doubles.get(varToUpdate.scope.vars.doubles.indexOf(varToUpdate)),
                                     operation = null,
-                                    blockState = this@Block,
-                            log         = log
+                                    blockState = this@Block
                                 )
                                 newLines.add(newLine)
                             }
                             varToUpdate is BooleanVar -> {
-                                varToUpdate.scope.vars.booleans.get(varToUpdate.scope.vars.booleans.indexOf(varToUpdate)).value = variableUpdate?.get("boolean")?.value?.toBoolean() ?: varToUpdate.scope.vars.booleans.get(varToUpdate.scope.vars.booleans.indexOf(varToUpdate)).value
+                                val param = Parameter(variableUpdate?.get("string")!!.value, null, this@Block, parser)
+                                param.evaluate()
+                                varToUpdate.scope.vars.booleans.get(varToUpdate.scope.vars.booleans.indexOf(varToUpdate)).value = (param.result as BooleanVar?)?.value ?: varToUpdate.scope.vars.booleans.get(varToUpdate.scope.vars.booleans.indexOf(varToUpdate)).value
                                 var newLine = Line(
                                     num = i,
                                     range = cumulativeChars until cumulativeChars + lineLen,
@@ -284,8 +439,7 @@ class Block (
                                     type = type,
                                     variable = varToUpdate.scope.vars.booleans.get(varToUpdate.scope.vars.booleans.indexOf(varToUpdate)),
                                     operation = null,
-                                    blockState = this@Block,
-                            log         = log
+                                    blockState = this@Block
                                 )
                                 newLines.add(newLine)
                             }
@@ -298,8 +452,7 @@ class Block (
                                     type = type,
                                     variable = varToUpdate.scope.vars.arrays.get(varToUpdate.scope.vars.arrays.indexOf(varToUpdate)),
                                     operation = null,
-                                    blockState = this@Block,
-                            log         = log
+                                    blockState = this@Block
                                 )
                                 newLines.add(newLine)
                             }
@@ -312,8 +465,7 @@ class Block (
                                     type = type,
                                     variable = varToUpdate.scope.vars.maps.get(varToUpdate.scope.vars.maps.indexOf(varToUpdate)),
                                     operation = null,
-                                    blockState = this@Block,
-                            log         = log
+                                    blockState = this@Block
                                 )
                                 newLines.add(newLine)
                             }
@@ -323,11 +475,18 @@ class Block (
                         }
                     }
                     l.matches(Regex("\\{\\s*child-(?<childnumber>\\d+)\\s*\\}")) -> {
-                        log.out("code block detected")
+                        parser.log.out("code block detected")
                         type = LineType.BLOCK
                         val blockDeclaration = Regex("\\{\\s*child-(?<childnumber>\\d+)\\s*\\}").find(l)!!.groups as? MatchNamedGroupCollection
-                        if (children.get(blockDeclaration?.get("childnumber")!!.value.toInt()).type == BlockType.WHILE) {
-                            (children.get(blockDeclaration?.get("childnumber")!!.value.toInt()).structure as? While)?.runBlock()
+                        val childNum : Int = blockDeclaration?.get("childnumber")?.value?.toInt() ?: -1
+                        if (children.get(childNum).type == BlockType.IF) {
+                            (children.get(childNum).structure as? If)?.ifGroup?.run()
+                        } else if (children.get(childNum).type == BlockType.FOR) {
+                            (children.get(childNum).structure as? For)?.runBlock()
+                        } else if (children.get(childNum).type == BlockType.FOREACH) {
+                            (children.get(childNum).structure as? ForEach)?.runBlock()
+                        } else if (children.get(childNum).type == BlockType.WHILE) {
+                            (children.get(childNum).structure as? While)?.runBlock()
                         }
                         var newLine = Line(
                             num = i,
@@ -336,16 +495,16 @@ class Block (
                             type = type,
                             variable = variable,
                             operation = null,
-                            blockState = this@Block,
-                            log         = log
+                            blockState = this@Block
                         )
                         newLines.add(newLine)
                     }
                     else -> {
-                        log.out("line $i <--$l--> could not be identified")
+                        parser.log.out("line $i <--$l--> could not be identified")
                     }
                 }
             }
+        return null
         lines = newLines
     }
 
@@ -359,92 +518,60 @@ class Block (
                 line.matches(parser.functionDeclarationRegex) && parent == null -> {
                     val functionDeclaration = parser.functionDeclarationRegex.find(line)!!.groups as? MatchNamedGroupCollection
                     child.type = BlockType.FUNCTION
-                    var functionParameters = mutableListOf<Any>()
-                    functionDeclaration?.get("params")!!.value.let { params ->
-                        functionParameters = if (functionParameters == null) mutableListOf() else functionParameters
-                        val paramsSplit = params.split(Regex(",\\s*"))
-                        paramsSplit.mapIndexed { i, param ->
-                            val paramParsed = Regex("(?<varname>[^,:\\n]+)\\s*:\\s*(?<type>[A-Z]\\w+)|(?<funname>\\w+)\\((?<params>.*)\\)").find(param)!!.groups as? MatchNamedGroupCollection
-                            if (paramParsed?.get("funname") == null) {
-                                val type = paramParsed?.get("type")!!.value
-                                when (type) {
-                                    "String" -> {
-                                        functionParameters.add(StringVar(
-                                            paramParsed?.get("varname")!!.value, "", false, this@Block, log))
-                                    }
-                                    "Double" -> {
-                                        functionParameters.add(DoubleVar(paramParsed?.get("varname")!!.value, 0.0, false, this@Block, log))
-                                    }
-                                    "Integer" -> {
-                                        functionParameters.add(IntegerVar(paramParsed?.get("varname")!!.value, 1, false, this@Block, log))
-                                    }
-                                    "Boolean" -> {
-                                        functionParameters.add(BooleanVar(paramParsed?.get("varname")!!.value, false, false, this@Block, log))
-                                    }
-                                    "Array" -> {
-                                        functionParameters.add(ArrayVar(paramParsed?.get("varname")!!.value, "String", false, this@Block, log))
-                                    }
-                                    "Map" -> {
-                                        functionParameters.add(MapVar(paramParsed?.get("varname")!!.value, null, null, false, this@Block, log))
-                                    }
-                                    else -> {
-                                        parser.log.out("invalid datatype")
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    child.structure = Function(child, functionDeclaration?.get("name")!!.value, functionParameters, functionDeclaration?.get("returntype")!!.value, log)
+                    child.structure = Function(
+                        child,
+                        functionDeclaration?.get("name")!!.value,
+                        functionDeclaration?.get("params")!!.value,
+                        functionDeclaration?.get("returntype")!!.value
+                    )
                 }
                 line.matches(parser.ifRegex) -> {
                     val ifDeclaration = parser.ifRegex.find(line)!!.groups as? MatchNamedGroupCollection
                     child.type = BlockType.IF
-                    var childStructure = If(child, Condition(ifDeclaration?.get("condition")!!.value, null, log), null, log)
-                    currIfGroup = IfGroup(mutableListOf(childStructure), log)
-                    childStructure.ifGroup = currIfGroup
-                    child.structure = childStructure
+                    currIfGroup = IfGroup(mutableListOf())
+                    var ifStruct = If(child, Condition(ifDeclaration?.get("condition")!!.value, null, this@Block, parser), currIfGroup)
+                    currIfGroup.ifs.add(ifStruct)
+                    ifStruct.ifGroup = currIfGroup
+                    child.structure = ifStruct
                 }
                 line.matches(parser.elifRegex) -> {
                     val elifDeclaration = parser.elifRegex.find(line)!!.groups as? MatchNamedGroupCollection
                     child.type = BlockType.ELIF
-                    var childStructure = If(child, Condition(elifDeclaration?.get("condition")!!.value, null, log), null, log)
-                    currIfGroup?.ifs!!.add(childStructure)
-                    childStructure.ifGroup = currIfGroup
+                    var elifStruct = If(child, Condition(elifDeclaration?.get("condition")!!.value, null, this@Block, parser), currIfGroup ?: IfGroup(mutableListOf()))
+                    currIfGroup?.ifs?.add(elifStruct)
                     child.structure = currIfGroup
                 }
                 line.matches(parser.elseRegex) -> {
                     child.type = BlockType.ELSE
-                    var childStructure = If(child, null, null, log)
-                    currIfGroup?.ifs!!.add(childStructure)
-                    childStructure.ifGroup = currIfGroup
-                    child.structure = childStructure
+                    var elseStruct = If(child, null, currIfGroup ?: IfGroup(mutableListOf()))
+                    currIfGroup?.ifs?.add(elseStruct)
+                    child.structure = elseStruct
                 }
                 line.matches(parser.forRegex) -> {
                     val forLoopDeclaration = parser.forRegex.find(line)!!.groups as? MatchNamedGroupCollection
                     if (forLoopDeclaration?.get("parama") == null) {
+
                         child.type = BlockType.FOR
                         var counterVar = Regex("(?<name>\\w+)\\s*\\=\\s*(?<value>\\d)").find(forLoopDeclaration?.get("param1")!!.value)!!.groups as? MatchNamedGroupCollection
                         child.structure = For(
                             block = child,
-                            counter = IntegerVar(counterVar?.get("name")!!.value, counterVar?.get("value")!!.value.toInt(), true, child, log),
-                            condition = Condition(forLoopDeclaration?.get("param2")!!.value, null, log),
-                            increment = forLoopDeclaration?.get("param3")!!.value.toInt(), 
-                            log
+                            counter = IntegerVar(counterVar?.get("name")!!.value, counterVar?.get("value")!!.value.toInt(), true, child),
+                            condition = Condition(forLoopDeclaration?.get("param2")!!.value, null, this@Block, parser),
+                            increment = forLoopDeclaration?.get("param3")!!.value.toInt()
                         )
                     } else {
                         child.type = BlockType.FOREACH
                         child.structure = ForEach(
                             block = child,
-                            collection = ArrayVar(forLoopDeclaration?.get("parama")!!.value, "String", false, child, log),
-                            element = forLoopDeclaration?.get("param2")!!.value, 
-                            log
+                            collection = ArrayVar(forLoopDeclaration?.get("parama")!!.value, "String", false, child),
+                            element = forLoopDeclaration?.get("param2")!!.value
                         )
                     }
                 }
                 line.matches(parser.whileRegex) -> {
                     val whileLoopDeclaration = parser.whileRegex.find(line)!!.groups as? MatchNamedGroupCollection
                     child.type = BlockType.WHILE
-                    child.structure = While(child, Condition(whileLoopDeclaration?.get("condition")!!.value, null, log), log)
+                    child.structure = While(child, Condition(whileLoopDeclaration?.get("condition")!!.value, null, this@Block, parser))
                 }
                 else -> {
                     parser.log.error("invalid block declaration on line ${child.lineRange.first}")

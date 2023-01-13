@@ -8,9 +8,8 @@ class ArrayVar (
     name : String,
     val type: String,
     mutable : Boolean,
-    scope: Block,
-    log : LogController
-) : Variable(name, mutable, scope, log) {
+    scope: Block
+) : Variable(name, mutable, scope) {
     private var stringArray  : List<StringVar>  = listOf<StringVar>()
     private var integerArray : List<IntegerVar> = listOf<IntegerVar>()
     private var doubleArray  : List<DoubleVar>  = listOf<DoubleVar>()
@@ -75,9 +74,9 @@ class ArrayVar (
     }
 
     fun parseCollection (collection : String) {
-        log.out("array detected")
+        scope.parser.log.out("array detected")
         var collectionArr : MutableList<Any?> = mutableListOf()
-        log.out("type: $type")
+        scope.parser.log.out("type: $type")
         when {
             type == "String" -> {
                 var strarr : MutableList<StringVar> = JSONObject("{\"stringarr\":${collection}}").getJSONArray("stringarr").mapIndexed { i, s ->
@@ -85,11 +84,10 @@ class ArrayVar (
                         name = "$name$i",
                         value = s.toString(),
                         mutable = mutable,
-                        scope = scope,
-                        log = log
+                        scope = scope
                     )
                 }.toMutableList()
-                strarr.forEach { log.out("${it.value}") }
+                strarr.forEach { scope.parser.log.out("${it.value}") }
                 array = strarr
             }
             type == "Int" || type == "Integer" -> {
@@ -98,11 +96,10 @@ class ArrayVar (
                         name = "$name$i",
                         value = s.toString().toInt(),
                         mutable = mutable,
-                        scope = scope,
-                        log = log
+                        scope = scope
                     )
                 }.toMutableList()
-                intarr.forEach { log.out("${it.value}") }
+                intarr.forEach { scope.parser.log.out("${it.value}") }
                 array = intarr
             }
             type == "Double" -> {
@@ -111,11 +108,10 @@ class ArrayVar (
                         name = "$name$i",
                         value = s.toString().toDouble(),
                         mutable = mutable,
-                        scope = scope,
-                        log = log
+                        scope = scope
                     )
                 }.toMutableList()
-                doublearr.forEach { log.out("${it.value}") }
+                doublearr.forEach { scope.parser.log.out("${it.value}") }
                 array = doublearr
             }
             type == "Boolean" -> {
@@ -124,11 +120,10 @@ class ArrayVar (
                         name = "$name$i",
                         value = s.toString().toBoolean(),
                         mutable = mutable,
-                        scope = scope,
-                        log = log
+                        scope = scope
                     )
                 }.toMutableList()
-                boolarr.forEach { log.out("${it.value}") }
+                boolarr.forEach { scope.parser.log.out("${it.value}") }
                 array = boolarr
             }
             else -> {
