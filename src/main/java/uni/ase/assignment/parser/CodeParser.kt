@@ -1,5 +1,9 @@
 package uni.ase.assignment.parser
 
+import javafx.collections.FXCollections
+import javafx.collections.ObservableList
+import javafx.collections.ObservableMap
+import javafx.concurrent.Task
 import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
 import javafx.scene.paint.Color
@@ -90,7 +94,7 @@ class CodeParser (
     /**
      * the run method that takes the code from the main [TextArea] and splits it line by line to be processed by each shapes draw class
      */
-    fun run() {
+    fun run(task : Task<ObservableMap<String, String>>) {
         log.out("running code");
         emptyVarArrays()
 
@@ -287,6 +291,8 @@ class CodeParser (
         allCode.parseLines()
 
         allCode.printChildren()
+
+        log.out("execution complete")
 
 //        blocks.forEachIndexed { index, block -> log.out("$index: ${block.type} ${block.name} (${block.parameters}) = ${block.code} in range: ${block.range} lines: ${block.lineRange} ${block.lines.joinToString("\n")} contains ${block.children.size} sub blocks has ${block.parent} as a parent and ${block.vars} are the variables in this scope") }
 

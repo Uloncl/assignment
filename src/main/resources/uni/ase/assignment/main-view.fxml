@@ -38,6 +38,11 @@
                                                                 <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                                                             </HBox.margin>
                                                         </FontIcon>
+                                          <FontIcon id="run" fx:id="stop" iconColor="RED" iconLiteral="bi-square-fill" iconSize="15" layoutX="302.0" layoutY="27.0" onMouseClicked="#stopCode">
+                                             <HBox.margin>
+                                                <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                             </HBox.margin>
+                                          </FontIcon>
                                                     </children>
                                                 </HBox>
                                             </children>

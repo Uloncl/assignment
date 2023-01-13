@@ -11,7 +11,9 @@ class Parameter (
     val parser : CodeParser
     ) {
     fun evaluate() {
+        parser.log.out("lets evaluate $param")
         if (param.contains("(?<left>[\\w\\\"\\'\\(\\),]+)\\s*(?<operator>\\+|\\-|\\*|/)\\s*(?<right>[\\w\\\"\\'\\(\\),]+)")) {
+            parser.log.out("it maths")
             val operation = Regex("(?<left>[\\w\\\"\\'\\(\\),]+)\\s*(?<operator>\\+|\\-|\\*|/)\\s*(?<right>[\\w\\\"\\'\\(\\),]+)").find(param)?.groupValues as? MatchNamedGroupCollection
             val operator = operation?.get("operator")?.value ?: ""
             val leftreg = operation?.get("left")?.value ?: ""
@@ -623,11 +625,14 @@ class Parameter (
                 }
             }
         } else {
+            parser.log.out("its a single value")
             when {
                 scope.findInScope(param.replace(" ", ""))?.isNotEmpty() ?: false -> {
-                    result = scope.findInScope(param.replace(" ", ""))?.first()!!
+                    result = scope.findInScope(param.replace(" ", ""))?.first()
+                    parser.log.out("its a variable called ${result?.name ?: "UNKNOWN"}")
                 }
                 param!!.matches(Regex("(?<bool>true|false)")) -> {
+                    parser.log.out("its a boolean")
                     val bool = Regex("(?<bool>true|false)").find(param)?.groupValues as? MatchNamedGroupCollection
                     result = BooleanVar(
                         name = "tempparam",
@@ -637,6 +642,7 @@ class Parameter (
                     )
                 }
                 param!!.matches(Regex("(\\\"(?<stringa>[^\\\"]+)\\\"|\\'(?<stringb>[^\\']+)\\')")) -> {
+                    parser.log.out("its a string")
                     val str = Regex("(\\\"(?<stringa>[^\\\"]+)\\\"|\\'(?<stringb>[^\\']+)\\')").find(param)?.groupValues as? MatchNamedGroupCollection
                     result = StringVar(
                         name = "tempparam",
@@ -646,6 +652,7 @@ class Parameter (
                     )
                 }
                 param!!.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
+                    parser.log.out("its a double")
                     val double = Regex("(?<double>\\d+\\.\\d+)").find(param)?.groupValues as? MatchNamedGroupCollection
                     result = DoubleVar(
                         name = "tempparam",
@@ -655,6 +662,7 @@ class Parameter (
                     )
                 }
                 param!!.matches(Regex("(?<int>\\d+)")) -> {
+                    parser.log.out("its a integer")
                     val inte = Regex("(?<int>\\d+)").find(param)?.groupValues as? MatchNamedGroupCollection
                     result = IntegerVar(
                         name = "tempparam",

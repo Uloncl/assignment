@@ -11,10 +11,12 @@ class For (
     var increment : Int
 ) : Structure (block) {
     fun runBlock() {
+        block.parser.log.out("running for ${counter.name} = ${counter.value} ; ${condition.condition} ; ${increment}")
         block.vars.integers.add(counter)
         condition.evaluate()
         var shouldRun : Boolean = condition.outcome ?: false
         while (shouldRun) {
+            block.parser.log.out("should the for loop run: $shouldRun")
             block.parseLines()
             block.vars.integers.find { it.name == counter.name }?.value?.plus(increment)
             condition.evaluate()

@@ -16,8 +16,12 @@ import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
-import uni.ase.assignment.controllers.*;
+import uni.ase.assignment.controllers.CanvasController;
+import uni.ase.assignment.controllers.CodeController;
+import uni.ase.assignment.controllers.ConsoleController;
+import uni.ase.assignment.controllers.LogController;
 import uni.ase.assignment.parser.CodeParser;
+import uni.ase.assignment.parser.CodeParserService;
 
 /**
  * the Main Controller class which is used to process actions from the main window such as clicks or movements
@@ -40,6 +44,8 @@ public class MainController {
     CodeParser cp;
     CodeController codc;
     ConsoleController conc;
+    CodeParserService cpTask;
+    Boolean cpTaskRunning = false;
 
     /**
      * an event handler to be used for custom fullscreen functionality
@@ -81,6 +87,7 @@ public class MainController {
         cp = new CodeParser(code, cac, lc, commandLine);
         codc = new CodeController(code, cp, stage);
         conc = new ConsoleController(commandLine, cac, lc, cp);
+        cpTask = new CodeParserService(cp);
 
         pen.setX(0);
         pen.setY(0);
@@ -108,7 +115,21 @@ public class MainController {
      * runs the code in the code textbox when the green play button above it is pressed
      */
     @FXML protected void runCode() {
-        cp.run();
+        if (!cpTaskRunning) {
+            cpTaskRunning = true;
+            cpTask.start();
+        }
+    }
+
+    /**
+     * runs the code in the code textbox when the green play button above it is pressed
+     */
+    @FXML protected void stopCode() {
+        if (cpTaskRunning) {
+            cpTaskRunning = false;
+            cpTask.cancel();
+            cpTask.reset();
+        }
     }
 
     /**
