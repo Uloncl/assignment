@@ -91,12 +91,10 @@ class CodeParser (
      * the run method that takes the code from the main [TextArea] and splits it line by line to be processed by each shapes draw class
      */
     fun run() {
-        log.out("running code");
         emptyVarArrays()
 
         var cumulativeChars : Int = 0
         var initialLines = mutableListOf<Line>()
-        log.out("running code");
 
         ca.text.split("\n").forEachIndexed { i, v ->
             val lineLen : Int = v.length
@@ -130,7 +128,6 @@ class CodeParser (
             ))
             cumulativeChars+=lineLen+1
         }
-        log.out("running code");
 
         allCode = Block(
             type        = BlockType.MAIN,
@@ -159,7 +156,6 @@ class CodeParser (
 //        }
 
         var blocks : MutableList<Block> = mutableListOf()
-        log.out("running code");
 
         allBetweenBraces.findAll(allCode.code).forEach { match ->
             var matchRange = match.range
@@ -192,11 +188,9 @@ class CodeParser (
                 )
             )
         }
-        log.out("running code");
 
         var parentsPossible = true;
         while (parentsPossible) {
-            log.out("running code");
             /** find a block of code that contains any combination of any known block of code */
             val tryFindParentRegex : String = blocks.filter { it.parent == null }.mapIndexed { i, block ->
                     "[^{}]*(?<block${i+1}>${
@@ -267,6 +261,9 @@ class CodeParser (
                     val orphanSearchRegex = Regex("(?<allcode>[\\s\\S]*(?<orphanblock>${
                         orphan.code
                             .replace("\n", "\\n")
+                            .replace("+", "\\+")
+                            .replace("-", "\\-")
+                            .replace("*", "\\*")
                             .replace("{", "\\{")
                             .replace("}", "\\}")
                             .replace("(", "\\(")
@@ -286,7 +283,6 @@ class CodeParser (
             }
             if (blocks.filter { it.parent == null }.size == 0) { parentsPossible = false }
         }
-        log.out("running code");
 
         allCode.replaceChildrenInCode()
         allCode.defineBlocks()

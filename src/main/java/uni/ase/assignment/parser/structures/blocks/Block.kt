@@ -121,205 +121,107 @@ class Block(
                         newLines.add(newLine)
                         val functioncall = parser.functionCallRegex.find(l)?.groups as? MatchNamedGroupCollection
                         val funcname = functioncall?.get("name")?.value ?: ""
-                        val funcparams =
-                            functioncall?.get("params")?.value?.split(Regex("\\,\\s*"))?.toMutableList() ?: mutableListOf()
+                        val funcparams = functioncall?.get("params")?.value?.split(Regex("\\,\\s*"))?.toMutableList() ?: mutableListOf()
+                        var funcParameters : List<Parameter> = funcparams.map {
+                            var param : Parameter = Parameter(it, null, this@Block)
+                            param.evaluate()
+                            parser.log.out(param.result.toString())
+                            return@map param
+                        }
                         when {
                             funcname == "Line" -> {
-                                var funcParameters : List<Parameter> = funcparams.map {
-                                    var param : Parameter = Parameter(it, null, this@Block)
-                                    param.evaluate()
-                                    parser.log.out(param.result.toString())
-                                    return@map param
-                                }
-                                parser.cac.DrawLine(
-                                    listOf(
-                                        (funcParameters.get(0)?.result as? IntegerVar)?.value?.toString(),
-                                        (funcParameters.get(1)?.result as? IntegerVar)?.value?.toString(),
-                                        (funcParameters.get(2)?.result as? IntegerVar)?.value?.toString(),
-                                        (funcParameters.get(3)?.result as? IntegerVar)?.value?.toString(),
-                                        (funcParameters.get(4)?.result as? StringVar)?.value
-                                    )
-                                )
+                                parser.cac.DrawLine(listOf("",
+                                    (funcParameters.get(0)?.result as? IntegerVar)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(1)?.result as? IntegerVar)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(2)?.result as? IntegerVar)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(3)?.result as? IntegerVar)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(4)?.result as? StringVar)?.value ?: "FFFFFF"
+                                ))
                             }
                             funcname == "Square" -> {
-                                parser.cac.DrawSquare(
-                                    listOf(
-                                        (findInScope(funcparams.get(0))?.firstOrNull() as IntegerVar?)?.value?.toString()
-                                            ?: funcparams.get(0),
-                                        (findInScope(funcparams.get(1))?.firstOrNull() as IntegerVar?)?.value?.toString()
-                                            ?: funcparams.get(1),
-                                        (findInScope(funcparams.get(2))?.firstOrNull() as IntegerVar?)?.value?.toString()
-                                            ?: funcparams.get(2),
-                                        (findInScope(funcparams.get(3))?.firstOrNull() as BooleanVar?)?.value?.toString()
-                                            ?: funcparams.get(3),
-                                        (findInScope(funcparams.get(4))?.firstOrNull() as StringVar?)?.value
-                                            ?: funcparams.get(4),
-                                        (findInScope(funcparams.get(5))?.firstOrNull() as StringVar?)?.value
-                                            ?: funcparams.get(5),
-                                        (findInScope(funcparams.get(6))?.firstOrNull() as BooleanVar?)?.value?.toString()
-                                            ?: funcparams.get(6),
-                                        (findInScope(funcparams.get(7))?.firstOrNull() as IntegerVar?)?.value?.toString()
-                                            ?: funcparams.get(7),
-                                    )
-                                )
+                                parser.cac.DrawSquare(listOf("",
+                                    (funcParameters.get(0)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(1)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(2)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(3)?.result as? BooleanVar?)?.value?.toString() ?: "false",
+                                    (funcParameters.get(4)?.result as? StringVar?)?.value ?: "FFFFFF",
+                                    (funcParameters.get(5)?.result as? StringVar?)?.value ?: "FFFFFF",
+                                    (funcParameters.get(6)?.result as? BooleanVar?)?.value?.toString() ?: "true",
+                                    (funcParameters.get(7)?.result as? IntegerVar?)?.value?.toString() ?: "0.0"
+                                ))
                             }
                             funcname == "Circle" -> {
-                                Circle(
-                                    parser.log, parser.cac.g,
-                                    (findInScope(funcparams.get(0))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(0).toDouble(),
-                                    (findInScope(funcparams.get(1))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(1).toDouble(),
-                                    (findInScope(funcparams.get(2))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(2).toDouble(),
-                                    (findInScope(funcparams.get(3))?.firstOrNull() as BooleanVar?)?.value
-                                        ?: funcparams.get(3).toBoolean(),
-                                    Color.web(
-                                        (findInScope(funcparams.get(4))?.firstOrNull() as StringVar?)?.value
-                                            ?: funcparams.get(4)
-                                    ),
-                                    Color.web(
-                                        (findInScope(funcparams.get(5))?.firstOrNull() as StringVar?)?.value
-                                            ?: funcparams.get(5)
-                                    )
-                                ).draw()
+                                parser.cac.DrawCircle(listOf("",
+                                    (funcParameters.get(0)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(1)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(2)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(3)?.result as? BooleanVar?)?.value?.toString() ?: "false",
+                                    (funcParameters.get(4)?.result as? StringVar?)?.value ?: "FFFFFF",
+                                    (funcParameters.get(5)?.result as? StringVar?)?.value ?: "FFFFFF",
+                                ))
                             }
                             funcname == "Rectangle" -> {
-                                Rectangle(
-                                    parser.log, parser.cac.g,
-                                    (findInScope(funcparams.get(0))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(0).toDouble(),
-                                    (findInScope(funcparams.get(1))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(1).toDouble(),
-                                    (findInScope(funcparams.get(2))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(2).toDouble(),
-                                    (findInScope(funcparams.get(3))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(3).toDouble(),
-                                    (findInScope(funcparams.get(4))?.firstOrNull() as BooleanVar?)?.value
-                                        ?: funcparams.get(4).toBoolean(),
-                                    (findInScope(funcparams.get(5))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(5).toDouble(),
-                                    (findInScope(funcparams.get(6))?.firstOrNull() as BooleanVar?)?.value
-                                        ?: funcparams.get(6).toBoolean(),
-                                    Color.web(
-                                        (findInScope(funcparams.get(7))?.firstOrNull() as StringVar?)?.value
-                                            ?: funcparams.get(7)
-                                    ),
-                                    Color.web(
-                                        (findInScope(funcparams.get(8))?.firstOrNull() as StringVar?)?.value
-                                            ?: funcparams.get(8)
-                                    )
-                                ).draw()
+                                parser.cac.DrawRect(listOf("",
+                                    (funcParameters.get(0)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(1)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(2)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(3)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(4)?.result as? BooleanVar?)?.value?.toString() ?: "false",
+                                    (funcParameters.get(5)?.result as? StringVar?)?.value ?: "FFFFFF",
+                                    (funcParameters.get(6)?.result as? StringVar?)?.value ?: "FFFFFF",
+                                    (funcParameters.get(7)?.result as? BooleanVar?)?.value?.toString() ?: "false",
+                                    (funcParameters.get(8)?.result as? IntegerVar?)?.value?.toString() ?: "0.0"
+                                ))
                             }
                             funcname == "Oval" -> {
-                                Oval(
-                                    parser.log, parser.cac.g,
-                                    (findInScope(funcparams.get(0))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(0).toDouble(),
-                                    (findInScope(funcparams.get(1))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(1).toDouble(),
-                                    (findInScope(funcparams.get(2))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(2).toDouble(),
-                                    (findInScope(funcparams.get(3))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(3).toDouble(),
-                                    (findInScope(funcparams.get(4))?.firstOrNull() as BooleanVar?)?.value
-                                        ?: funcparams.get(4).toBoolean(),
-                                    Color.web(
-                                        (findInScope(funcparams.get(5))?.firstOrNull() as StringVar?)?.value
-                                            ?: funcparams.get(5)
-                                    ),
-                                    Color.web(
-                                        (findInScope(funcparams.get(6))?.firstOrNull() as StringVar?)?.value
-                                            ?: funcparams.get(6)
-                                    )
-                                ).draw()
+                                parser.cac.DrawOval(listOf("",
+                                    (funcParameters.get(0)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(1)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(2)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(3)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(4)?.result as? BooleanVar?)?.value?.toString() ?: "false",
+                                    (funcParameters.get(5)?.result as? StringVar?)?.value ?: "FFFFFF",
+                                    (funcParameters.get(6)?.result as? StringVar?)?.value ?: "FFFFFF"
+                                ))
                             }
                             funcname == "Polygon" -> {
-                                var polypreset = PolygonPreset.NONE
-                                Polygon(
-                                    parser.log, parser.cac.g,
-                                    (findInScope(funcparams.get(0))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(0).toDouble(),
-                                    (findInScope(funcparams.get(1))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(1).toDouble(),
-                                    (findInScope(funcparams.get(2))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(2).toDouble(),
-                                    (findInScope(funcparams.get(3))?.firstOrNull() as IntegerVar?)?.value?.toInt()
-                                        ?: funcparams.get(3).toInt(),
-                                    polypreset,
-                                    (findInScope(funcparams.get(4))?.firstOrNull() as BooleanVar?)?.value
-                                        ?: funcparams.get(4).toBoolean(),
-                                    Color.web(
-                                        (findInScope(funcparams.get(5))?.firstOrNull() as StringVar?)?.value
-                                            ?: funcparams.get(5)
-                                    ),
-                                    Color.web(
-                                        (findInScope(funcparams.get(6))?.firstOrNull() as StringVar?)?.value
-                                            ?: funcparams.get(6)
-                                    )
-                                ).draw()
+                                parser.cac.DrawPolygon(listOf("",
+                                    (funcParameters.get(0)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(1)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(2)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(3)?.result as? IntegerVar?)?.value?.toString() ?: "0",
+                                    (funcParameters.get(4)?.result as? BooleanVar?)?.value?.toString() ?: "false",
+                                    (funcParameters.get(5)?.result as? StringVar?)?.value ?: "FFFFFF",
+                                    (funcParameters.get(6)?.result as? StringVar?)?.value ?: "FFFFFF"
+                                ))
                             }
                             funcname == "Polyline" -> {
-                                var polypreset = PolylinePreset.NONE
-                                Polyline(
-                                    parser.log, parser.cac.g,
-                                    (findInScope(funcparams.get(0))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(0).toDouble(),
-                                    (findInScope(funcparams.get(1))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(1).toDouble(),
-                                    (findInScope(funcparams.get(2))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(2).toDouble(),
-                                    (findInScope(funcparams.get(3))?.firstOrNull() as IntegerVar?)?.value?.toInt()
-                                        ?: funcparams.get(3).toInt(),
-                                    polypreset,
-                                    Color.web(
-                                        (findInScope(funcparams.get(4))?.firstOrNull() as StringVar?)?.value
-                                            ?: funcparams.get(4)
-                                    )
-                                ).draw()
+                                parser.cac.DrawPolyline(listOf("",
+                                    (funcParameters.get(0)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(1)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(2)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(3)?.result as? IntegerVar?)?.value?.toString() ?: "0",
+                                    (funcParameters.get(4)?.result as? StringVar?)?.value ?: "FFFFFF"
+                                ))
                             }
                             funcname == "Arc" -> {
-                                Arc(
-                                    parser.log, parser.cac.g,
-                                    (findInScope(funcparams.get(0))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(0).toDouble(),
-                                    (findInScope(funcparams.get(1))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(1).toDouble(),
-                                    (findInScope(funcparams.get(2))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(2).toDouble(),
-                                    (findInScope(funcparams.get(3))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(3).toDouble(),
-                                    (findInScope(funcparams.get(4))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(4).toDouble(),
-                                    (findInScope(funcparams.get(5))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(5).toDouble(),
-                                    ArcType.OPEN,
-                                    Color.web(
-                                        (findInScope(funcparams.get(6))?.firstOrNull() as StringVar?)?.value
-                                            ?: funcparams.get(6)
-                                    )
-                                ).draw()
+                                parser.cac.DrawArc(listOf("",
+                                    (funcParameters.get(0)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(1)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(2)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(3)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(4)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(5)?.result as? IntegerVar?)?.value?.toString() ?: "90.0",
+                                    (funcParameters.get(6)?.result as? StringVar?)?.value ?: "FFFFFF"
+                                ))
                             }
                             funcname == "Text" -> {
-                                Text(
-                                    parser.log, parser.cac.g,
-                                    (findInScope(funcparams.get(0))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(0).toDouble(),
-                                    (findInScope(funcparams.get(1))?.firstOrNull() as IntegerVar?)?.value?.toDouble()
-                                        ?: funcparams.get(1).toDouble(),
-                                    (findInScope(funcparams.get(2))?.firstOrNull() as StringVar?)?.value
-                                        ?: funcparams.get(2),
-                                    (findInScope(funcparams.get(4))?.firstOrNull() as BooleanVar?)?.value
-                                        ?: funcparams.get(4).toBoolean(),
-                                    Color.web(
-                                        (findInScope(funcparams.get(5))?.firstOrNull() as StringVar?)?.value
-                                            ?: funcparams.get(5)
-                                    ),
-                                    Color.web(
-                                        (findInScope(funcparams.get(6))?.firstOrNull() as StringVar?)?.value
-                                            ?: funcparams.get(6)
-                                    )
-                                ).draw()
+                                parser.cac.DrawText(listOf("",
+                                    (funcParameters.get(0)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(1)?.result as? IntegerVar?)?.value?.toString() ?: "0.0",
+                                    (funcParameters.get(2)?.result as? StringVar?)?.value ?: "Example Text",
+                                    (funcParameters.get(3)?.result as? StringVar?)?.value ?: "FFFFFF"
+                                ))
                             }
 //                            "Triangle" -> {
 //                            }
@@ -691,6 +593,7 @@ class Block(
                             (children.get(childNum).structure as? ForEach)?.runBlock()
                         } else if (children.get(childNum).type == BlockType.WHILE) {
                             parser.log.out("while block detected")
+                            println("while block detected")
                             (children.get(childNum).structure as? While)?.runBlock()
                         }
                         var newLine = Line(

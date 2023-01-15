@@ -24,6 +24,7 @@ class LogController (val log: TextArea) {
      */
     fun out(text: String) {
         log.appendText("$text\n")
+        println("$text")
     }
 
     /**
