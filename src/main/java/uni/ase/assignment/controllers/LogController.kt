@@ -1,7 +1,6 @@
 package uni.ase.assignment.controllers
 
 import javafx.scene.control.TextArea
-import kotlin.concurrent.thread
 
 /**
  * controller for controlling the log [TextArea] used for displaying outputs and errors

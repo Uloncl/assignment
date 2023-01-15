@@ -1,12 +1,8 @@
 package uni.ase.assignment.parser
 
-import javafx.collections.FXCollections
-import javafx.collections.ObservableList
-import javafx.collections.ObservableMap
 import javafx.concurrent.Task
 import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
-import javafx.scene.paint.Color
 import uni.ase.assignment.controllers.CanvasController
 import uni.ase.assignment.controllers.ConsoleController
 import uni.ase.assignment.controllers.LogController
@@ -65,8 +61,8 @@ class CodeParser (
     val booleanRegex : Regex = Regex("(True|False)")
     val paramOrFunRegex : Regex = Regex("\\\".*\\\"|\\'.*\\'|\\d+\\.\\d+|\\d+|[a-zA-Z0-9_\\\"'\\.\\(\\)\\,\\ ]+")
 
-    val variableDeclarationRegex : Regex = Regex("(?<mutable>var|val)\\s*(?<name>[a-z]\\w*)\\s*:\\s*((?<collectiontype>[A-Z]\\w+<[\\w, \\<\\>]+>)|(?<type>[A-Z]\\w+))\\s*\\=\\s*(?<value>(?<string>\\\".+\\\"|'.+')|(?<double>\\d+\\.\\d+)|(?<integer>\\d+)|(?<function>(?<funcname>\\w+)\\((?<funcparams>.*)\\))|(?<null>null)|(?<boolean>true|false)|(?<collection>\\[.+\\]))")
-    val variableUpdateRegex : Regex = Regex("(?<name>\\w+)\\s*(?<method>\\=|\\+\\=|\\-\\=)\\s*(?<value>(?<string>\\\".+\\\"|'.+')|(?<double>\\d+\\.\\d+)|(?<integer>\\d+)|(?<function>(?<funcname>\\w+)\\((?<funcparams>.*)\\))|(?<null>null)|(?<boolean>true|false)|(?<collection>\\[.++\\]))")
+    val variableDeclarationRegex : Regex = Regex("(?<mutable>var|val)\\s*(?<name>[a-z]\\w*)\\s*:\\s*((?<collectiontype>[A-Z]\\w+<[\\w, \\<\\>]+>)|(?<type>[A-Z]\\w+))\\s*\\=\\s*(?<value>[^\\n]+)")
+    val variableUpdateRegex : Regex = Regex("(?<name>\\w+)\\s*(?<method>\\=|\\+\\=|\\-\\=)\\s*(?<value>[^\\n]+)")
 
     val functionCallRegex : Regex = Regex("(?<name>[A-Z]\\w+)\\((?<params>.*)\\)")
 
@@ -94,12 +90,13 @@ class CodeParser (
     /**
      * the run method that takes the code from the main [TextArea] and splits it line by line to be processed by each shapes draw class
      */
-    fun run(task : Task<ObservableMap<String, String>>) {
+    fun run() {
         log.out("running code");
         emptyVarArrays()
 
         var cumulativeChars : Int = 0
         var initialLines = mutableListOf<Line>()
+        log.out("running code");
 
         ca.text.split("\n").forEachIndexed { i, v ->
             val lineLen : Int = v.length
@@ -133,6 +130,7 @@ class CodeParser (
             ))
             cumulativeChars+=lineLen+1
         }
+        log.out("running code");
 
         allCode = Block(
             type        = BlockType.MAIN,
@@ -161,6 +159,7 @@ class CodeParser (
 //        }
 
         var blocks : MutableList<Block> = mutableListOf()
+        log.out("running code");
 
         allBetweenBraces.findAll(allCode.code).forEach { match ->
             var matchRange = match.range
@@ -193,9 +192,11 @@ class CodeParser (
                 )
             )
         }
+        log.out("running code");
 
         var parentsPossible = true;
         while (parentsPossible) {
+            log.out("running code");
             /** find a block of code that contains any combination of any known block of code */
             val tryFindParentRegex : String = blocks.filter { it.parent == null }.mapIndexed { i, block ->
                     "[^{}]*(?<block${i+1}>${
@@ -285,6 +286,7 @@ class CodeParser (
             }
             if (blocks.filter { it.parent == null }.size == 0) { parentsPossible = false }
         }
+        log.out("running code");
 
         allCode.replaceChildrenInCode()
         allCode.defineBlocks()
@@ -292,24 +294,7 @@ class CodeParser (
 
         allCode.printChildren()
 
+
         log.out("execution complete")
-
-//        blocks.forEachIndexed { index, block -> log.out("$index: ${block.type} ${block.name} (${block.parameters}) = ${block.code} in range: ${block.range} lines: ${block.lineRange} ${block.lines.joinToString("\n")} contains ${block.children.size} sub blocks has ${block.parent} as a parent and ${block.vars} are the variables in this scope") }
-
-//        log.out("\n\n\n")
-//        log.out("\n\n\nall strings")
-//        allCode.vars.strings!!.forEachIndexed     { index, stringVar  -> log.out("$index: ${stringVar.name} = ${stringVar.value} is mutable: ${stringVar.mutable}") }
-//        log.out("\n\n\nall integers")
-//        allCode.vars.integers!!.forEachIndexed    { index, integerVar -> log.out("$index: ${integerVar.name} = ${integerVar.value} is mutable: ${integerVar.mutable}") }
-//        log.out("\n\n\nall doubles")
-//        allCode.vars.doubles!!.forEachIndexed     { index, doubleVar  -> log.out("$index: ${doubleVar.name} = ${doubleVar.value} is mutable: ${doubleVar.mutable}") }
-//        log.out("\n\n\nall booleans")
-//        allCode.vars.booleans!!.forEachIndexed    { index, booleanVar -> log.out("$index: ${booleanVar.name} = ${booleanVar.value} is mutable: ${booleanVar.mutable}") }
-//        log.out("\n\n\nall arrays")
-//        allCode.vars.arrays!!.forEachIndexed      { index, arrayVar   -> log.out("$index: ${arrayVar.type} ${arrayVar.name} = ${arrayVar.array} is mutable: ${arrayVar.mutable}") }
-//        log.out("\n\n\nall maps")
-//        allCode.vars.maps!!.forEachIndexed        { index, mapVar     -> log.out("$index: <${mapVar.keyType}, ${mapVar.valType}> ${mapVar.name} = ${mapVar.map} is mutable: ${mapVar.mutable}") }
-//        log.out("\n\n\nall blocks")
-//        allCode.subBlocks!!.forEachIndexed        { index, block     -> log.out("$index: ${block.type} ${block.name} (${block.parameters}) = ${block.code} in range: ${block.range} lines: ${block.lineRange} ${block.lines.joinToString("\n")} contains ${block.subBlocks.size} sub blocks has ${block.parent} as a parent and ${block.vars} are the variables in this scope") }
     }
 }

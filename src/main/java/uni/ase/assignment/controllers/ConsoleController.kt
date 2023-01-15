@@ -3,7 +3,6 @@ package uni.ase.assignment.controllers
 import javafx.scene.control.TextField
 import javafx.scene.paint.Color
 import uni.ase.assignment.parser.CodeParser
-import uni.ase.assignment.parser.CodeParserService
 import uni.ase.assignment.shapes.Rectangle
 import java.util.*
 
@@ -16,7 +15,6 @@ import java.util.*
  * @param log the [LogController] used for outputting messages and errors to the log
  */
 class ConsoleController (val cmd: TextField, val cc: CanvasController, val log: LogController, val cp: CodeParser) {
-    var cpTask: CodeParserService = CodeParserService(cp);
     var cpTaskRunning = false
     /**
      * if there is a command stored ahead of the current [cmdIndex] in the [cmdHist] array and puts it in the [cmd] [TextField]
@@ -130,20 +128,19 @@ class ConsoleController (val cmd: TextField, val cc: CanvasController, val log: 
                 cc.g.stroke = Color.web("0xcccccc")
                 cc.fill = false
             }
-            cmdstr.startsWith("clearlog") -> log.clear()
-            cmdstr.startsWith("run") -> {
-                if (!cpTaskRunning) {
-                    cpTaskRunning = true
-                    cpTask.start()
-                }
-            }
-            cmdstr.startsWith("stop") -> {
-                if (cpTaskRunning) {
-                    cpTaskRunning = false
-                    cpTask.cancel()
-                    cpTask.reset()
-                }
-            }
+//            cmdstr.startsWith("run") -> {
+//                if (!cpTaskRunning) {
+//                    cpTaskRunning = true
+//                    cpTask.start()
+//                }
+//            }
+//            cmdstr.startsWith("stop") -> {
+//                if (cpTaskRunning) {
+//                    cpTaskRunning = false
+//                    cpTask.cancel()
+//                    cpTask.reset()
+//                }
+//            }
              else -> {
                 log.error("command not recognised")
             }

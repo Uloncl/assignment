@@ -13,8 +13,7 @@ class Variables (
     val parser : CodeParser
 ) {
     fun hasVar (name : String) : List<Variable>? {
-        var all : List<Variable> = mutableListOf(strings, integers, doubles, booleans, arrays, maps).flatten()
-        return all.filter { it.name == name }
+        return mutableListOf(strings, integers, doubles, booleans, arrays, maps).flatten().filter { it.name == name }
     }
 
     fun update (vars : Variables) {

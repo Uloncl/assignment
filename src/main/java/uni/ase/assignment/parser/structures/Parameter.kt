@@ -7,25 +7,30 @@ import uni.ase.assignment.parser.structures.variables.*
 class Parameter (
     val param : String,
     var result : Variable?,
-    val scope : Block,
-    val parser : CodeParser
+    val scope : Block
     ) {
     fun evaluate() {
-        parser.log.out("lets evaluate $param")
-        if (param.contains("(?<left>[\\w\\\"\\'\\(\\),]+)\\s*(?<operator>\\+|\\-|\\*|/)\\s*(?<right>[\\w\\\"\\'\\(\\),]+)")) {
-            parser.log.out("it maths")
-            val operation = Regex("(?<left>[\\w\\\"\\'\\(\\),]+)\\s*(?<operator>\\+|\\-|\\*|/)\\s*(?<right>[\\w\\\"\\'\\(\\),]+)").find(param)?.groupValues as? MatchNamedGroupCollection
-            val operator = operation?.get("operator")?.value ?: ""
-            val leftreg = operation?.get("left")?.value ?: ""
-            val rightreg = operation?.get("right")?.value ?: ""
+        scope.parser.log.out("lets evaluate $param")
+        if (param.contains(Regex("(?<left>[\\w\\\"\\'\\(\\),]+)\\s*(?<operator>\\+|\\-|\\*|/)\\s*(?<right>[\\w\\\"\\'\\(\\),]+)"))) {
+            scope.parser.log.out("it maths")
+            val operation = Regex("(?<left>[\\w\\\"\\'\\(\\),]+)\\s*(?<operator>\\+|\\-|\\*|/)\\s*(?<right>[\\w\\\"\\'\\(\\),]+)").findAll(param).firstOrNull()?.groups
+            operation?.forEach { scope.parser.log.out(it?.value ?: "") }
+            val operator = operation?.get(2)?.value ?: ""
+            val leftreg = operation?.get(1)?.value ?: ""
+            val rightreg = operation?.get(3)?.value ?: ""
+//            val operator = ""
+//            val leftreg = ""
+//            val rightreg = ""
+            scope.parser.log.out("${leftreg} - ${operator} - ${rightreg}")
             when (operator) {
                 "+" -> {
+                    scope.parser.log.out("${leftreg} + ${rightreg}")
                     when {
                         scope.findInScope(leftreg.replace(" ", ""))?.isNotEmpty() ?: false -> {
-                            var left = scope.findInScope(leftreg.replace(" ", ""))?.first()!!
+                            var left = scope.findInScope(leftreg.replace(" ", ""))?.first()
                             when {
                                 scope.findInScope(rightreg.replace(" ", ""))?.isNotEmpty() ?: false -> {
-                                    val right = scope.findInScope(rightreg.replace(" ", ""))?.first()!!
+                                    val right = scope.findInScope(rightreg.replace(" ", ""))?.first()
                                     when {
                                         left is IntegerVar -> {
                                             when {
@@ -81,126 +86,114 @@ class Parameter (
                                         }
                                     }
                                 }
-                                rightreg!!.matches(Regex("(\\\"(?<stringa>[^\\\"]+)\\\"|\\'(?<stringb>[^\\']+)\\')")) -> {
+                                rightreg.matches(Regex("(\\\"(?<stringa>[^\\\"]+)\\\"|\\'(?<stringb>[^\\']+)\\')")) -> {
                                     if (left is StringVar) {
-                                        val str = Regex("(\\\"(?<stringa>[^\\\"]+)\\\"|\\'(?<stringb>[^\\']+)\\')").find(rightreg)?.groupValues as? MatchNamedGroupCollection
                                         result = StringVar(
                                             name = "result",
-                                            value = "${left.value}${(str?.get("stringa")?.value ?: str?.get("stringb")?.value ?: "")}",
+                                            value = "${left.value}${(rightreg.substring(1..rightreg.length - 2))}",
                                             mutable = false,
                                             scope = scope
                                         )
                                     }
                                 }
-                                rightreg!!.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
+                                rightreg.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
                                     if (left is DoubleVar) {
-                                        val double = Regex("(?<double>\\d+\\.\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
                                         result = DoubleVar(
                                             name = "result",
-                                            value = left.value + double?.get("double")!!.value.toDouble(),
+                                            value = left.value + (rightreg?.toDouble() ?: 0.0),
                                             mutable = false,
                                             scope = scope
                                         )
                                     } else if (left is IntegerVar) {
-                                        val double = Regex("(?<double>\\d+\\.\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
                                         result = DoubleVar(
                                             name = "result",
-                                            value = left.value + double?.get("double")!!.value.toDouble(),
+                                            value = left.value + (rightreg?.toDouble() ?: 0.0),
                                             mutable = false,
                                             scope = scope
                                         )
                                     }
                                 }
-                                rightreg!!.matches(Regex("(?<int>\\d+)")) -> {
+                                rightreg.matches(Regex("(?<int>\\d+)")) -> {
                                     if (left is DoubleVar) {
-                                        val inte = Regex("(?<int>\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
                                         result = DoubleVar(
                                             name = "result",
-                                            value = left.value + inte?.get("int")!!.value.toInt(),
+                                            value = left.value + (rightreg?.toInt() ?: 0),
                                             mutable = false,
                                             scope = scope
                                         )
                                     } else if (left is IntegerVar) {
-                                        val inte = Regex("(?<int>\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
+                                        scope.parser.log.out("${left.value} + ${rightreg?.toInt()}")
                                         result = IntegerVar(
                                             name = "result",
-                                            value = left.value + inte?.get("int")!!.value.toInt(),
+                                            value = left.value + (rightreg?.toInt() ?: 0),
                                             mutable = false,
                                             scope = scope
                                         )
+                                        scope.parser.log.out("result = ${(result as IntegerVar).value}")
                                     }
                                 }
                             }
                         }
-                        leftreg!!.matches(Regex("(\\\"(?<stringa>[^\\\"]+)\\\"|\\'(?<stringb>[^\\']+)\\')")) -> {
-                            val left = Regex("(\\\"(?<stringa>[^\\\"]+)\\\"|\\'(?<stringb>[^\\']+)\\')").find(rightreg)?.groupValues as? MatchNamedGroupCollection
-                            val leftval = left?.get("stringa")?.value ?: left?.get("stringb")?.value ?: ""
+                        leftreg.matches(Regex("(\\\"(?<stringa>[^\\\"]+)\\\"|\\'(?<stringb>[^\\']+)\\')")) -> {
                             when {
                                 scope.findInScope(rightreg.replace(" ", ""))?.isNotEmpty() ?: false -> {
-                                    val right = scope.findInScope(rightreg.replace(" ", ""))?.first()!!
+                                    val right = scope.findInScope(rightreg.replace(" ", ""))?.first()
                                     when {
                                         right is StringVar -> {
                                             result = StringVar(
                                                 name = "result",
-                                                value = "$leftval${right.value}",
+                                                value = "${(leftreg.substring(1..rightreg.length - 2))}${right.value}",
                                                 mutable = false,
                                                 scope = scope
                                             )
                                         }
                                     }
                                 }
-                                rightreg!!.matches(Regex("(\\\"(?<stringa>[^\\\"]+)\\\"|\\'(?<stringb>[^\\']+)\\')")) -> {
-                                    val right =
-                                        Regex("(\\\"(?<stringa>[^\\\"]+)\\\"|\\'(?<stringb>[^\\']+)\\')").find(rightreg)?.groupValues as? MatchNamedGroupCollection
+                                rightreg.matches(Regex("(\\\"(?<stringa>[^\\\"]+)\\\"|\\'(?<stringb>[^\\']+)\\')")) -> {
                                     result = StringVar(
                                         name = "result",
-                                        value = "$leftval${(right?.get("stringa")?.value ?: right?.get("stringb")?.value ?: "")}",
+                                        value = "${(leftreg.substring(1..rightreg.length - 2))}${(rightreg.substring(1..rightreg.length - 2))}",
                                         mutable = false,
                                         scope = scope
                                     )
                                 }
                             }
                         }
-                        leftreg!!.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
-                            val left = Regex("(?<double>\\d+\\.\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
+                        leftreg.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
                             when {
-                                rightreg!!.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
-                                    val right = Regex("(?<double>\\d+\\.\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
+                                rightreg.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
                                     result = DoubleVar(
                                         name = "result",
-                                        value = left?.get("double")!!.value.toDouble() + right?.get("double")!!.value.toDouble(),
+                                        value = leftreg.toDouble() + rightreg.toDouble(),
                                         mutable = false,
                                         scope = scope
                                     )
                                 }
-                                rightreg!!.matches(Regex("(?<int>\\d+)")) -> {
-                                    val right = Regex("(?<int>\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
+                                rightreg.matches(Regex("(?<int>\\d+)")) -> {
                                     result = DoubleVar(
                                         name = "result",
-                                        value = left?.get("double")!!.value.toDouble() + right?.get("int")!!.value.toInt(),
+                                        value = leftreg.toDouble() + rightreg.toInt(),
                                         mutable = false,
                                         scope = scope
                                     )
                                 }
                             }
                         }
-                        leftreg!!.matches(Regex("(?<int>\\d+)")) -> {
-                            val left = Regex("(?<int>\\d+)").find(leftreg)?.groupValues as? MatchNamedGroupCollection
+                        leftreg.matches(Regex("(?<int>\\d+)")) -> {
                             when {
-                                rightreg!!.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
-                                    val right = Regex("(?<double>\\d+\\.\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
+                                rightreg.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
                                     result = DoubleVar(
                                         name = "result",
-                                        value = left?.get("int")!!.value.toInt() + right?.get("double")!!.value.toDouble(),
+                                        value = leftreg.toInt() + rightreg.toDouble(),
                                         mutable = false,
                                         scope = scope
                                     )
                                 }
-                                rightreg!!.matches(Regex("(?<int>\\d+)")) -> {
-                                    val right = Regex("(?<int>\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
+                                rightreg.matches(Regex("(?<int>\\d+)")) -> {
+                                    scope.parser.log.out("theyre both ints")
                                     result = IntegerVar(
                                         name = "result",
-                                        value = left?.get("int")!!.value.toInt() + right?.get("int")!!.value.toInt(),
+                                        value = leftreg.toInt() + rightreg.toInt(),
                                         mutable = false,
                                         scope = scope
                                     )
@@ -212,10 +205,10 @@ class Parameter (
                 "-" -> {
                     when {
                         scope.findInScope(leftreg.replace(" ", ""))?.isNotEmpty() ?: false -> {
-                            var left = scope.findInScope(leftreg.replace(" ", ""))?.first()!!
+                            var left = scope.findInScope(leftreg.replace(" ", ""))?.first()
                             when {
                                 scope.findInScope(rightreg.replace(" ", ""))?.isNotEmpty() ?: false -> {
-                                    val right = scope.findInScope(rightreg.replace(" ", ""))?.first()!!
+                                    val right = scope.findInScope(rightreg.replace(" ", ""))?.first()
                                     when {
                                         left is IntegerVar -> {
                                             when {
@@ -259,39 +252,35 @@ class Parameter (
                                         }
                                     }
                                 }
-                                rightreg!!.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
+                                rightreg.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
                                     if (left is DoubleVar) {
-                                        val double = Regex("(?<double>\\d+\\.\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
                                         result = DoubleVar(
                                             name = "result",
-                                            value = left.value - double?.get("double")!!.value.toDouble(),
+                                            value = left.value - (rightreg?.toDouble() ?: 0.0),
                                             mutable = false,
                                             scope = scope
                                         )
                                     } else if (left is IntegerVar) {
-                                        val double = Regex("(?<double>\\d+\\.\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
                                         result = DoubleVar(
                                             name = "result",
-                                            value = left.value - double?.get("double")!!.value.toDouble(),
+                                            value = left.value - (rightreg?.toDouble() ?: 0.0),
                                             mutable = false,
                                             scope = scope
                                         )
                                     }
                                 }
-                                rightreg!!.matches(Regex("(?<int>\\d+)")) -> {
+                                rightreg.matches(Regex("(?<int>\\d+)")) -> {
                                     if (left is DoubleVar) {
-                                        val inte = Regex("(?<int>\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
                                         result = DoubleVar(
                                             name = "result",
-                                            value = left.value - inte?.get("int")!!.value.toInt(),
+                                            value = left.value - (rightreg?.toInt() ?: 0),
                                             mutable = false,
                                             scope = scope
                                         )
                                     } else if (left is IntegerVar) {
-                                        val inte = Regex("(?<int>\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
                                         result = IntegerVar(
                                             name = "result",
-                                            value = left.value - inte?.get("int")!!.value.toInt(),
+                                            value = left.value - (rightreg?.toInt() ?: 0),
                                             mutable = false,
                                             scope = scope
                                         )
@@ -299,46 +288,40 @@ class Parameter (
                                 }
                             }
                         }
-                        leftreg!!.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
-                            val left = Regex("(?<double>\\d+\\.\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
+                        leftreg.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
                             when {
-                                rightreg!!.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
-                                    val right = Regex("(?<double>\\d+\\.\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
+                                rightreg.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
                                     result = DoubleVar(
                                         name = "result",
-                                        value = left?.get("double")!!.value.toDouble() - right?.get("double")!!.value.toDouble(),
+                                        value = (leftreg?.toDouble() ?: 0.0) - (rightreg?.toDouble() ?: 0.0),
                                         mutable = false,
                                         scope = scope
                                     )
                                 }
-                                rightreg!!.matches(Regex("(?<int>\\d+)")) -> {
-                                    val right = Regex("(?<int>\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
+                                rightreg.matches(Regex("(?<int>\\d+)")) -> {
                                     result = DoubleVar(
                                         name = "result",
-                                        value = left?.get("double")!!.value.toDouble() - right?.get("int")!!.value.toInt(),
+                                        value = (leftreg?.toDouble() ?: 0.0) - (rightreg?.toInt() ?: 0),
                                         mutable = false,
                                         scope = scope
                                     )
                                 }
                             }
                         }
-                        leftreg!!.matches(Regex("(?<int>\\d+)")) -> {
-                            val left = Regex("(?<int>\\d+)").find(leftreg)?.groupValues as? MatchNamedGroupCollection
+                        leftreg.matches(Regex("(?<int>\\d+)")) -> {
                             when {
-                                rightreg!!.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
-                                    val right = Regex("(?<double>\\d+\\.\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
+                                rightreg.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
                                     result = DoubleVar(
                                         name = "result",
-                                        value = left?.get("int")!!.value.toInt() - right?.get("double")!!.value.toDouble(),
+                                        value = (leftreg?.toInt() ?: 0) - (rightreg?.toDouble() ?: 0.0),
                                         mutable = false,
                                         scope = scope
                                     )
                                 }
-                                rightreg!!.matches(Regex("(?<int>\\d+)")) -> {
-                                    val right = Regex("(?<int>\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
+                                rightreg.matches(Regex("(?<int>\\d+)")) -> {
                                     result = IntegerVar(
                                         name = "result",
-                                        value = left?.get("int")!!.value.toInt() - right?.get("int")!!.value.toInt(),
+                                        value = (leftreg?.toInt() ?: 0) - (rightreg?.toInt() ?: 0),
                                         mutable = false,
                                         scope = scope
                                     )
@@ -350,10 +333,10 @@ class Parameter (
                 "*" -> {
                     when {
                         scope.findInScope(leftreg.replace(" ", ""))?.isNotEmpty() ?: false -> {
-                            var left = scope.findInScope(leftreg.replace(" ", ""))?.first()!!
+                            var left = scope.findInScope(leftreg.replace(" ", ""))?.first()
                             when {
                                 scope.findInScope(rightreg.replace(" ", ""))?.isNotEmpty() ?: false -> {
-                                    val right = scope.findInScope(rightreg.replace(" ", ""))?.first()!!
+                                    val right = scope.findInScope(rightreg.replace(" ", ""))?.first()
                                     when {
                                         left is IntegerVar -> {
                                             when {
@@ -397,39 +380,35 @@ class Parameter (
                                         }
                                     }
                                 }
-                                rightreg!!.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
+                                rightreg.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
                                     if (left is DoubleVar) {
-                                        val double = Regex("(?<double>\\d+\\.\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
                                         result = DoubleVar(
                                             name = "result",
-                                            value = left.value * double?.get("double")!!.value.toDouble(),
+                                            value = left.value * (rightreg?.toDouble() ?: 0.0),
                                             mutable = false,
                                             scope = scope
                                         )
                                     } else if (left is IntegerVar) {
-                                        val double = Regex("(?<double>\\d+\\.\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
                                         result = DoubleVar(
                                             name = "result",
-                                            value = left.value * double?.get("double")!!.value.toDouble(),
+                                            value = left.value * (rightreg?.toDouble() ?: 0.0),
                                             mutable = false,
                                             scope = scope
                                         )
                                     }
                                 }
-                                rightreg!!.matches(Regex("(?<int>\\d+)")) -> {
+                                rightreg.matches(Regex("(?<int>\\d+)")) -> {
                                     if (left is DoubleVar) {
-                                        val inte = Regex("(?<int>\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
                                         result = DoubleVar(
                                             name = "result",
-                                            value = left.value * inte?.get("int")!!.value.toInt(),
+                                            value = left.value * (rightreg?.toInt() ?: 0),
                                             mutable = false,
                                             scope = scope
                                         )
                                     } else if (left is IntegerVar) {
-                                        val inte = Regex("(?<int>\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
                                         result = IntegerVar(
                                             name = "result",
-                                            value = left.value * inte?.get("int")!!.value.toInt(),
+                                            value = left.value * (rightreg?.toInt() ?: 0),
                                             mutable = false,
                                             scope = scope
                                         )
@@ -437,46 +416,40 @@ class Parameter (
                                 }
                             }
                         }
-                        leftreg!!.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
-                            val left = Regex("(?<double>\\d+\\.\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
+                        leftreg.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
                             when {
-                                rightreg!!.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
-                                    val right = Regex("(?<double>\\d+\\.\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
+                                rightreg.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
                                     result = DoubleVar(
                                         name = "result",
-                                        value = left?.get("double")!!.value.toDouble() * right?.get("double")!!.value.toDouble(),
+                                        value = (leftreg?.toDouble() ?: 0.0) * (rightreg?.toDouble() ?: 0.0),
                                         mutable = false,
                                         scope = scope
                                     )
                                 }
-                                rightreg!!.matches(Regex("(?<int>\\d+)")) -> {
-                                    val right = Regex("(?<int>\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
+                                rightreg.matches(Regex("(?<int>\\d+)")) -> {
                                     result = DoubleVar(
                                         name = "result",
-                                        value = left?.get("double")!!.value.toDouble() * right?.get("int")!!.value.toInt(),
+                                        value = (leftreg?.toDouble() ?: 0.0) * (rightreg?.toInt() ?: 0),
                                         mutable = false,
                                         scope = scope
                                     )
                                 }
                             }
                         }
-                        leftreg!!.matches(Regex("(?<int>\\d+)")) -> {
-                            val left = Regex("(?<int>\\d+)").find(leftreg)?.groupValues as? MatchNamedGroupCollection
+                        leftreg.matches(Regex("(?<int>\\d+)")) -> {
                             when {
-                                rightreg!!.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
-                                    val right = Regex("(?<double>\\d+\\.\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
+                                rightreg.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
                                     result = DoubleVar(
                                         name = "result",
-                                        value = left?.get("int")!!.value.toInt() * right?.get("double")!!.value.toDouble(),
+                                        value = (leftreg?.toInt() ?: 0) * (rightreg?.toDouble() ?: 0.0),
                                         mutable = false,
                                         scope = scope
                                     )
                                 }
-                                rightreg!!.matches(Regex("(?<int>\\d+)")) -> {
-                                    val right = Regex("(?<int>\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
+                                rightreg.matches(Regex("(?<int>\\d+)")) -> {
                                     result = IntegerVar(
                                         name = "result",
-                                        value = left?.get("int")!!.value.toInt() * right?.get("int")!!.value.toInt(),
+                                        value = (leftreg?.toInt() ?: 0) * (rightreg?.toInt() ?: 0),
                                         mutable = false,
                                         scope = scope
                                     )
@@ -488,10 +461,10 @@ class Parameter (
                 "/" -> {
                     when {
                         scope.findInScope(leftreg.replace(" ", ""))?.isNotEmpty() ?: false -> {
-                            var left = scope.findInScope(leftreg.replace(" ", ""))?.first()!!
+                            var left = scope.findInScope(leftreg.replace(" ", ""))?.first()
                             when {
                                 scope.findInScope(rightreg.replace(" ", ""))?.isNotEmpty() ?: false -> {
-                                    val right = scope.findInScope(rightreg.replace(" ", ""))?.first()!!
+                                    val right = scope.findInScope(rightreg.replace(" ", ""))?.first()
                                     when {
                                         left is IntegerVar -> {
                                             when {
@@ -535,39 +508,35 @@ class Parameter (
                                         }
                                     }
                                 }
-                                rightreg!!.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
+                                rightreg.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
                                     if (left is DoubleVar) {
-                                        val double = Regex("(?<double>\\d+\\.\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
                                         result = DoubleVar(
                                             name = "result",
-                                            value = left.value / double?.get("double")!!.value.toDouble(),
+                                            value = left.value / (rightreg?.toDouble() ?: 0.0),
                                             mutable = false,
                                             scope = scope
                                         )
                                     } else if (left is IntegerVar) {
-                                        val double = Regex("(?<double>\\d+\\.\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
                                         result = DoubleVar(
                                             name = "result",
-                                            value = left.value / double?.get("double")!!.value.toDouble(),
+                                            value = left.value / (rightreg?.toDouble() ?: 0.0),
                                             mutable = false,
                                             scope = scope
                                         )
                                     }
                                 }
-                                rightreg!!.matches(Regex("(?<int>\\d+)")) -> {
+                                rightreg.matches(Regex("(?<int>\\d+)")) -> {
                                     if (left is DoubleVar) {
-                                        val inte = Regex("(?<int>\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
                                         result = DoubleVar(
                                             name = "result",
-                                            value = left.value / inte?.get("int")!!.value.toInt(),
+                                            value = left.value / (rightreg?.toInt() ?: 0),
                                             mutable = false,
                                             scope = scope
                                         )
                                     } else if (left is IntegerVar) {
-                                        val inte = Regex("(?<int>\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
                                         result = IntegerVar(
                                             name = "result",
-                                            value = left.value / inte?.get("int")!!.value.toInt(),
+                                            value = left.value / (rightreg?.toInt() ?: 0),
                                             mutable = false,
                                             scope = scope
                                         )
@@ -575,46 +544,43 @@ class Parameter (
                                 }
                             }
                         }
-                        leftreg!!.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
-                            val left = Regex("(?<double>\\d+\\.\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
+                        leftreg.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
                             when {
-                                rightreg!!.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
-                                    val right = Regex("(?<double>\\d+\\.\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
+                                rightreg.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
                                     result = DoubleVar(
                                         name = "result",
-                                        value = left?.get("double")!!.value.toDouble() / right?.get("double")!!.value.toDouble(),
+                                        value = (leftreg?.toDouble() ?: 0.0) / (rightreg?.toDouble() ?: 0.0),
                                         mutable = false,
                                         scope = scope
                                     )
                                 }
-                                rightreg!!.matches(Regex("(?<int>\\d+)")) -> {
-                                    val right = Regex("(?<int>\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
+                                rightreg.matches(Regex("(?<int>\\d+)")) -> {
                                     result = DoubleVar(
                                         name = "result",
-                                        value = left?.get("double")!!.value.toDouble() / right?.get("int")!!.value.toInt(),
+                                        value = (leftreg?.toDouble() ?: 0.0) / (rightreg?.toInt() ?: 0),
                                         mutable = false,
                                         scope = scope
                                     )
                                 }
                             }
                         }
-                        leftreg!!.matches(Regex("(?<int>\\d+)")) -> {
+                        leftreg.matches(Regex("(?<int>\\d+)")) -> {
                             val left = Regex("(?<int>\\d+)").find(leftreg)?.groupValues as? MatchNamedGroupCollection
                             when {
-                                rightreg!!.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
+                                rightreg.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
                                     val right = Regex("(?<double>\\d+\\.\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
                                     result = DoubleVar(
                                         name = "result",
-                                        value = left?.get("int")!!.value.toInt() / right?.get("double")!!.value.toDouble(),
+                                        value = (leftreg?.toInt() ?: 0) / (rightreg?.toDouble() ?: 0.0),
                                         mutable = false,
                                         scope = scope
                                     )
                                 }
-                                rightreg!!.matches(Regex("(?<int>\\d+)")) -> {
+                                rightreg.matches(Regex("(?<int>\\d+)")) -> {
                                     val right = Regex("(?<int>\\d+)").find(rightreg)?.groupValues as? MatchNamedGroupCollection
                                     result = IntegerVar(
                                         name = "result",
-                                        value = left?.get("int")!!.value.toInt() / right?.get("int")!!.value.toInt(),
+                                        value = (leftreg?.toInt() ?: 0) / (rightreg?.toInt() ?: 0),
                                         mutable = false,
                                         scope = scope
                                     )
@@ -625,53 +591,52 @@ class Parameter (
                 }
             }
         } else {
-            parser.log.out("its a single value")
+            scope.parser.log.out("<${param}> is a single parameter a single value")
             when {
-                scope.findInScope(param.replace(" ", ""))?.isNotEmpty() ?: false -> {
-                    result = scope.findInScope(param.replace(" ", ""))?.first()
-                    parser.log.out("its a variable called ${result?.name ?: "UNKNOWN"}")
+                scope.findInScope(param.filterNot { it.isWhitespace() })?.isNotEmpty() ?: false -> {
+                    scope.parser.log.out("its a variable")
+                    result = scope.findInScope(param.filterNot { it.isWhitespace() })?.first()
+                    scope.parser.log.out("its a variable called ${result?.name ?: "UNKNOWN"}")
                 }
-                param!!.matches(Regex("(?<bool>true|false)")) -> {
-                    parser.log.out("its a boolean")
-                    val bool = Regex("(?<bool>true|false)").find(param)?.groupValues as? MatchNamedGroupCollection
+                param?.matches(Regex("(?<bool>true|false)")) ?: false -> {
+                    scope.parser.log.out("<${param}> is a boolean")
                     result = BooleanVar(
                         name = "tempparam",
-                        value = bool?.get("bool")?.value?.toBoolean() ?: false,
+                        value = param.toBoolean() ?: false,
                         mutable = false,
                         scope = scope
                     )
+                    scope.parser.log.out("result = <$result>")
                 }
-                param!!.matches(Regex("(\\\"(?<stringa>[^\\\"]+)\\\"|\\'(?<stringb>[^\\']+)\\')")) -> {
-                    parser.log.out("its a string")
-                    val str = Regex("(\\\"(?<stringa>[^\\\"]+)\\\"|\\'(?<stringb>[^\\']+)\\')").find(param)?.groupValues as? MatchNamedGroupCollection
+                param?.matches(Regex("(\\\"(?<stringa>[^\\\"]+)\\\"|\\'(?<stringb>[^\\']+)\\')")) ?: false -> {
+                    scope.parser.log.out("its a string")
                     result = StringVar(
                         name = "tempparam",
-                        value = str?.get("stringa")?.value ?: str?.get("stringb")?.value ?: "",
+                        value = param.substring(1..param.length - 2) ?: "",
                         mutable = false,
                         scope = scope
                     )
                 }
-                param!!.matches(Regex("(?<double>\\d+\\.\\d+)")) -> {
-                    parser.log.out("its a double")
-                    val double = Regex("(?<double>\\d+\\.\\d+)").find(param)?.groupValues as? MatchNamedGroupCollection
+                param?.matches(Regex("(?<double>\\d+\\.\\d+)")) ?: false -> {
+                    scope.parser.log.out("its a double")
                     result = DoubleVar(
                         name = "tempparam",
-                        value = double?.get("double")!!.value.toDouble(),
+                        value = param.toDouble() ?: 0.0,
                         mutable = false,
                         scope = scope
                     )
                 }
-                param!!.matches(Regex("(?<int>\\d+)")) -> {
-                    parser.log.out("its a integer")
-                    val inte = Regex("(?<int>\\d+)").find(param)?.groupValues as? MatchNamedGroupCollection
+                param?.matches(Regex("(?<int>\\d+)")) ?: false -> {
+                    scope.parser.log.out("<$param> is an integer")
                     result = IntegerVar(
                         name = "tempparam",
-                        value = inte?.get("int")!!.value.toInt(),
+                        value = param.toInt(),
                         mutable = false,
                         scope = scope
                     )
                 }
             }
         }
+        scope.parser.log.out("result = <$result>")
     }
 }

@@ -8,11 +8,11 @@ class While (
     var condition : Condition
 ) : Structure (block) {
     fun runBlock() {
-        block.parser.log.out("running while loop")
+        println("running while loop")
         condition.evaluate()
-        block.parser.log.out("while condition = ${condition.outcome}")
         var shouldRun : Boolean = condition.outcome ?: false
         while (shouldRun) {
+            println("while (${condition.outcome})")
             block.parseLines()
             condition.evaluate()
             shouldRun = condition.outcome ?: true

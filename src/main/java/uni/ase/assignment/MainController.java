@@ -1,5 +1,6 @@
 package uni.ase.assignment;
 
+import javafx.concurrent.Service;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Rectangle2D;
@@ -21,7 +22,7 @@ import uni.ase.assignment.controllers.CodeController;
 import uni.ase.assignment.controllers.ConsoleController;
 import uni.ase.assignment.controllers.LogController;
 import uni.ase.assignment.parser.CodeParser;
-import uni.ase.assignment.parser.CodeParserService;
+import uni.ase.assignment.services.CodeParserService;
 
 /**
  * the Main Controller class which is used to process actions from the main window such as clicks or movements
@@ -34,6 +35,7 @@ public class MainController {
     Stage stage;
     FontIcon fullscreenico;
     @FXML FontIcon run;
+    @FXML FontIcon stop;
     @FXML ImageView pen;
     @FXML TextArea code;
     @FXML TextArea out;
@@ -44,8 +46,8 @@ public class MainController {
     CodeParser cp;
     CodeController codc;
     ConsoleController conc;
-    CodeParserService cpTask;
-    Boolean cpTaskRunning = false;
+    Service cpTask;
+    Service blockTask;
 
     /**
      * an event handler to be used for custom fullscreen functionality
@@ -82,12 +84,13 @@ public class MainController {
         canvas.getGraphicsContext2D().fillRect(0, 0, 10000, 10000);
         out.setEditable(false);
 
+
         lc = new LogController(out);
         cac = new CanvasController(canvas.getGraphicsContext2D(), lc);
         cp = new CodeParser(code, cac, lc, commandLine);
         codc = new CodeController(code, cp, stage);
         conc = new ConsoleController(commandLine, cac, lc, cp);
-        cpTask = new CodeParserService(cp);
+        cpTask = new CodeParserService(cp, run, stop);
 
         pen.setX(0);
         pen.setY(0);
@@ -115,21 +118,15 @@ public class MainController {
      * runs the code in the code textbox when the green play button above it is pressed
      */
     @FXML protected void runCode() {
-        if (!cpTaskRunning) {
-            cpTaskRunning = true;
-            cpTask.start();
-        }
+        cp.run();
     }
 
     /**
      * runs the code in the code textbox when the green play button above it is pressed
      */
     @FXML protected void stopCode() {
-        if (cpTaskRunning) {
-            cpTaskRunning = false;
-            cpTask.cancel();
-            cpTask.reset();
-        }
+        cpTask.cancel();
+        cpTask.reset();
     }
 
     /**

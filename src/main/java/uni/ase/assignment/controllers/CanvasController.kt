@@ -1,5 +1,8 @@
 package uni.ase.assignment.controllers
 
+import javafx.application.Application.launch
+import javafx.application.Platform.runLater
+import javafx.concurrent.Task
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import javafx.scene.shape.ArcType
@@ -267,6 +270,7 @@ class CanvasController(val g: GraphicsContext, val log: LogController) {
      * draws an oval with the coordinates [x], [y] and size [h] x [w]
      */
     fun DrawSquare(params: List<String>) {
+        params.forEachIndexed { index, s -> log.out("$index: $s") }
         try {
             when (params.size) {
                 1 -> log.error("not enough parameters")
@@ -335,7 +339,8 @@ class CanvasController(val g: GraphicsContext, val log: LogController) {
     /**
      * draws a line from the coordinates [x1], [y1] to [x2], [y2]
      */
-    fun DrawLine(params: List<String>) {
+    fun DrawLine(params: List<String?>) {
+        log.out("drawing a line")
         try {
             when (params.size) {
                 1 -> log.error("not enough parameters")
@@ -344,19 +349,19 @@ class CanvasController(val g: GraphicsContext, val log: LogController) {
                 4 -> Line(
                     log,
                     g,
-                    x1 = params[0].toDouble(),
-                    y1 = params[1].toDouble(),
-                    x2 = params[2].toDouble(),
-                    y2 = params[3].toDouble()
+                    x1 = params[0]?.toDouble() ?: 0.0,
+                    y1 = params[1]?.toDouble() ?: 0.0,
+                    x2 = params[2]?.toDouble() ?: 0.0,
+                    y2 = params[3]?.toDouble() ?: 0.0
                 ).draw()
                 5 -> Line(
                     log,
                     g,
-                    x1 = params[0].toDouble(),
-                    y1 = params[1].toDouble(),
-                    x2 = params[2].toDouble(),
-                    y2 = params[3].toDouble(),
-                    strokeCol = Color.web(params[4])
+                    x1 = params[0]?.toDouble() ?: 0.0,
+                    y1 = params[1]?.toDouble() ?: 0.0,
+                    x2 = params[2]?.toDouble() ?: 0.0,
+                    y2 = params[3]?.toDouble() ?: 0.0,
+                    strokeCol = Color.web(getHex(params[4] ?: "FFFFFF"))
                 ).draw()
                 else -> log.error("incorrect number of parameters")
             }
@@ -680,6 +685,7 @@ class CanvasController(val g: GraphicsContext, val log: LogController) {
      */
     fun getHex(colour: String) : String {
         var colour = colour.lowercase()
+        colour = colour.filterNot { it.isWhitespace() }
         when(colour) {
             "white" -> {
                 log.out("stroke colour changed to $colour")
@@ -737,8 +743,7 @@ class CanvasController(val g: GraphicsContext, val log: LogController) {
                 if (colour.startsWith("#")) {
                     return colour
                 } else {
-                    return ""
-                    log.error("invalid colour")
+                    return "#$colour"
                 }
             }
         }
