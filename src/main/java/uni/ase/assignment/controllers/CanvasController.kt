@@ -339,29 +339,30 @@ class CanvasController(val g: GraphicsContext, val log: LogController) {
     /**
      * draws a line from the coordinates [x1], [y1] to [x2], [y2]
      */
-    fun DrawLine(params: List<String?>) {
+    fun DrawLine(params: List<String>) {
         log.out("drawing a line")
         try {
             when (params.size) {
                 1 -> log.error("not enough parameters")
                 2 -> log.error("not enough parameters")
                 3 -> log.error("not enough parameters")
-                4 -> Line(
-                    log,
-                    g,
-                    x1 = params[0]?.toDouble() ?: 0.0,
-                    y1 = params[1]?.toDouble() ?: 0.0,
-                    x2 = params[2]?.toDouble() ?: 0.0,
-                    y2 = params[3]?.toDouble() ?: 0.0
-                ).draw()
+                4 -> log.error("not enough parameters")
                 5 -> Line(
                     log,
                     g,
-                    x1 = params[0]?.toDouble() ?: 0.0,
-                    y1 = params[1]?.toDouble() ?: 0.0,
-                    x2 = params[2]?.toDouble() ?: 0.0,
-                    y2 = params[3]?.toDouble() ?: 0.0,
-                    strokeCol = Color.web(getHex(params[4] ?: "FFFFFF"))
+                    x1 = params[1].toDouble(),
+                    y1 = params[2].toDouble(),
+                    x2 = params[3].toDouble(),
+                    y2 = params[4].toDouble()
+                ).draw()
+                6 -> Line(
+                    log,
+                    g,
+                    x1 = params[1].toDouble(),
+                    y1 = params[2].toDouble(),
+                    x2 = params[3].toDouble(),
+                    y2 = params[4].toDouble(),
+                    strokeCol = Color.web(getHex(params[5]))
                 ).draw()
                 else -> log.error("incorrect number of parameters")
             }
@@ -433,7 +434,7 @@ class CanvasController(val g: GraphicsContext, val log: LogController) {
                     startAngle = params[5].toDouble(),
                     endAngle = params[6].toDouble(),
                     closingMethod = ArcType.OPEN,
-                    strokeCol = Color.web(getHex(params[8]))
+                    strokeCol = Color.web(getHex(params[7]))
                 ).draw()
                 else -> log.error("incorrect number of parameters")
             }
@@ -500,9 +501,9 @@ class CanvasController(val g: GraphicsContext, val log: LogController) {
                     r = params[3].toDouble(),
                     n = params[4].toInt(),
                     preset = PolygonPreset.NONE,
-                    fill = params[6].toBoolean(),
-                    strokeCol = Color.web(getHex(params[7])),
-                    fillCol = Color.web(getHex(params[8]))
+                    fill = params[5].toBoolean(),
+                    strokeCol = Color.web(getHex(params[6])),
+                    fillCol = Color.web(getHex(params[7]))
                 ).draw()
                 else -> log.error("incorrect number of parameters")
             }
@@ -548,7 +549,7 @@ class CanvasController(val g: GraphicsContext, val log: LogController) {
                     r = params[3].toDouble(),
                     n = params[4].toInt(),
                     preset = PolylinePreset.NONE,
-                    strokeCol = Color.web(getHex(params[6]))
+                    strokeCol = Color.web(getHex(params[5]))
                 ).draw()
                 else -> log.error("incorrect number of parameters")
             }
